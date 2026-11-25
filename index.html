@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>IFCO Smart Expedição - Americana</title>
+  <title>IFCO Americana Expedição</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -24,8 +24,8 @@
       <div class="flex items-center gap-3 cursor-pointer" onclick="voltarMenu()">
         <div class="bg-white text-[#007A33] font-black px-2.5 py-1 rounded text-lg tracking-tighter">IFCO</div>
         <div>
-          <h1 class="font-bold text-sm sm:text-base leading-tight">Expedição Inteligente</h1>
-          <p class="text-[11px] text-emerald-100">Filial Americana • Controle de Pátio</p>
+          <h1 class="font-bold text-sm sm:text-base leading-tight">IFCO Americana Expedição</h1>
+          <p class="text-[11px] text-emerald-100">Controle Inteligente de Pátio e Doca</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -69,23 +69,6 @@
             </div>
           </button>
         </div>
-      </div>
-
-      <!-- Configuração rápida da URL do Apps Script -->
-      <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
-        <details>
-          <summary class="text-xs font-semibold text-slate-500 cursor-pointer flex items-center justify-between">
-            <span><i class="fa-solid fa-gear mr-1.5"></i> Configuração de Conexão (Google Sheets)</span>
-            <span id="statusConexaoBadge" class="text-emerald-700 font-bold">Configurado</span>
-          </summary>
-          <div class="mt-3 space-y-2">
-            <label class="block text-xs text-slate-600">URL do Web App (Google Apps Script):</label>
-            <div class="flex gap-2">
-              <input id="inputScriptUrl" type="text" class="flex-1 text-xs border border-slate-300 rounded-lg px-3 py-2" placeholder="https://script.google.com/macros/s/..." />
-              <button onclick="salvarScriptUrl()" class="ifco-green text-white text-xs font-bold px-3 py-2 rounded-lg">Salvar</button>
-            </div>
-          </div>
-        </details>
       </div>
     </section>
 
@@ -348,10 +331,9 @@
 
   <script>
     // =========================================================================
-    // CONFIGURAÇÃO E ESTADO GLOBAL
+    // CONFIGURAÇÃO E ESTADO GLOBAL (V2 ISOLADA)
     // =========================================================================
-    const DEFAULT_SCRIPT_URL = "COLE_AQUI_A_URL_DO_SEU_GOOGLE_APPS_SCRIPT";
-    let SCRIPT_URL = localStorage.getItem("ifco_script_url") || DEFAULT_SCRIPT_URL;
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaSH6HpGUX27waLqdqUN8V4DAKvR4kSqLhkDlBTcdgycF7Bz0WZIvAWgpuZEA2Dq8o/exec";
 
     let todosPedidos = [];
     let itensCadastroTemp = [];
@@ -363,10 +345,6 @@
 
     // Inicialização
     window.addEventListener("DOMContentLoaded", () => {
-      if (SCRIPT_URL && SCRIPT_URL !== DEFAULT_SCRIPT_URL) {
-        document.getElementById("inputScriptUrl").value = SCRIPT_URL;
-      }
-
       // Preenche data/hora sugerida no cadastro manual
       const agora = new Date();
       const dia = String(agora.getDate()).padStart(2, '0');
@@ -375,9 +353,9 @@
       const min = String(agora.getMinutes()).padStart(2, '0');
       document.getElementById("cadDataHora").value = `${dia}/${mes} ${hora}:${min}`;
 
-      // Recupera sessão do operador se a tela do celular bloqueou
-      const savedOp = localStorage.getItem("ifco_op_ativo");
-      const savedPerfil = localStorage.getItem("ifco_perfil_atual");
+      // Recupera sessão do operador V2 se a tela do celular bloqueou
+      const savedOp = localStorage.getItem("ifco_v2_op_ativo");
+      const savedPerfil = localStorage.getItem("ifco_v2_perfil_atual");
 
       if (savedPerfil) {
         abrirPerfil(savedPerfil, true);
@@ -388,20 +366,11 @@
       }
     });
 
-    function salvarScriptUrl() {
-      const val = document.getElementById("inputScriptUrl").value.trim();
-      if (!val) return mostrarToast("Insira uma URL válida", true);
-      SCRIPT_URL = val;
-      localStorage.setItem("ifco_script_url", val);
-      mostrarToast("URL salva com sucesso!");
-      carregarDados();
-    }
-
     // =========================================================================
     // NAVEGAÇÃO ENTRE PERFIS
     // =========================================================================
     function abrirPerfil(perfil, skipFetch = false) {
-      localStorage.setItem("ifco_perfil_atual", perfil);
+      localStorage.setItem("ifco_v2_perfil_atual", perfil);
       document.getElementById("viewMenu").classList.add("hidden");
       document.getElementById("btnMenuTop").classList.remove("hidden");
 
@@ -414,13 +383,12 @@
         document.getElementById("viewFaturista").classList.add("hidden");
       }
 
-      if (!skipFetch) carregarDados();
-      else carregarDados();
+      carregarDados();
     }
 
     function voltarMenu() {
       pararQrAgenda();
-      localStorage.removeItem("ifco_perfil_atual");
+      localStorage.removeItem("ifco_v2_perfil_atual");
       document.getElementById("viewMenu").classList.remove("hidden");
       document.getElementById("viewFaturista").classList.add("hidden");
       document.getElementById("viewOperador").classList.add("hidden");
@@ -431,12 +399,6 @@
     // COMUNICAÇÃO COM GOOGLE SHEETS
     // =========================================================================
     async function carregarDados() {
-      if (!SCRIPT_URL || SCRIPT_URL === DEFAULT_SCRIPT_URL) {
-        renderizarTabelaAgendados();
-        renderizarFilaOperador();
-        return;
-      }
-
       toggleSync(true);
       try {
         const res = await fetch(SCRIPT_URL);
@@ -453,10 +415,6 @@
     }
 
     async function enviarPost(payload) {
-      if (!SCRIPT_URL || SCRIPT_URL === DEFAULT_SCRIPT_URL) {
-        mostrarToast("Configure a URL do Google Apps Script no Início!", true);
-        return false;
-      }
       toggleSync(true);
       try {
         await fetch(SCRIPT_URL, {
@@ -610,7 +568,6 @@
       });
 
       if (ok) {
-        // Atualiza localmente na hora para fluidez imediata
         todosPedidos.unshift({
           pedido,
           status: "Agendado",
@@ -780,7 +737,7 @@
 
     async function abrirRomaneioOperador(pedidoObj, restoring = false) {
       pedidoAtivoOperador = pedidoObj;
-      localStorage.setItem("ifco_op_ativo", JSON.stringify(pedidoObj));
+      localStorage.setItem("ifco_v2_op_ativo", JSON.stringify(pedidoObj));
 
       document.getElementById("opListaContainer").classList.add("hidden");
       document.getElementById("opRomaneioContainer").classList.remove("hidden");
@@ -816,7 +773,7 @@
     }
 
     function fecharRomaneioOperador() {
-      localStorage.removeItem("ifco_op_ativo");
+      localStorage.removeItem("ifco_v2_op_ativo");
       pedidoAtivoOperador = null;
       document.getElementById("opRomaneioContainer").classList.add("hidden");
       document.getElementById("opListaContainer").classList.remove("hidden");
