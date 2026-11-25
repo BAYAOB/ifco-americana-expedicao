@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>IFCO Americana Expedição</title>
+  <title>IFCO Expedição Nacional</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -13,19 +13,18 @@
     .ifco-green { background-color: #007A33; }
     .ifco-green-dark { background-color: #005A25; }
     .ifco-text { color: #007A33; }
-    .ifco-border { border-color: #007A33; }
   </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
 
   <!-- HEADER GLOBAL -->
   <header class="ifco-green text-white shadow-md sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-3 cursor-pointer" onclick="voltarMenu()">
         <div class="bg-white text-[#007A33] font-black px-2.5 py-1 rounded text-lg tracking-tighter">IFCO</div>
         <div>
-          <h1 class="font-bold text-sm sm:text-base leading-tight">IFCO Americana Expedição</h1>
-          <p class="text-[11px] text-emerald-100">Controle Inteligente de Pátio e Doca</p>
+          <h1 class="font-bold text-sm sm:text-base leading-tight">IFCO Expedição Inteligente</h1>
+          <p class="text-[11px] text-emerald-100">Hub Central de Faturamento & Controle de Doca</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
@@ -40,7 +39,7 @@
   </header>
 
   <!-- CONTEÚDO PRINCIPAL -->
-  <main class="flex-1 max-w-6xl w-full mx-auto p-4">
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4">
 
     <!-- ==================== TELA 0: MENU DE PERFIL ==================== -->
     <section id="viewMenu" class="max-w-3xl mx-auto mt-6 space-y-4">
@@ -49,22 +48,22 @@
         <p class="text-sm text-slate-500 mt-1">Escolha a interface operacional para iniciar</p>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-          <!-- Faturamento -->
+          <!-- Faturamento (Hub Nacional) -->
           <button onclick="abrirPerfil('faturista')" class="group p-6 rounded-2xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-center flex flex-col items-center justify-center">
             <div class="w-12 h-12 rounded-xl ifco-green text-white flex items-center justify-center text-xl mb-3 group-hover:scale-105 transition">
               <i class="fa-solid fa-file-invoice-dollar"></i>
             </div>
             <h3 class="font-extrabold text-base text-slate-800">Faturamento</h3>
-            <p class="text-xs text-slate-500 mt-1">Agenda do dia, check-in e registro de NF</p>
+            <p class="text-xs text-slate-500 mt-1">Hub Central • Agenda Brasil e registro de NF</p>
           </button>
 
-          <!-- Operador Logístico -->
-          <button onclick="abrirPerfil('operador')" class="group p-6 rounded-2xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-center flex flex-col items-center justify-center">
+          <!-- Operador Logístico (Acesso por Filial) -->
+          <button onclick="abrirModalLoginOperador()" class="group p-6 rounded-2xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-center flex flex-col items-center justify-center">
             <div class="w-12 h-12 rounded-xl bg-slate-800 text-white flex items-center justify-center text-xl mb-3 group-hover:scale-105 transition">
               <i class="fa-solid fa-dolly"></i>
             </div>
             <h3 class="font-extrabold text-base text-slate-800">Operador Logístico</h3>
-            <p class="text-xs text-slate-500 mt-1">Fila de doca, romaneio, foto e avaliação</p>
+            <p class="text-xs text-slate-500 mt-1">Fila exclusiva da filial, romaneio e NPS</p>
           </button>
 
           <!-- Planilha / Relatório (Área Restrita) -->
@@ -81,14 +80,14 @@
       </div>
     </section>
 
-    <!-- ==================== MÓDULO FATURISTA ==================== -->
-    <section id="viewFaturista" class="hidden space-y-4">
+    <!-- ==================== MÓDULO FATURISTA (HUB BRASIL) ==================== -->
+    <section id="viewFaturista" class="hidden max-w-6xl mx-auto space-y-4">
 
       <!-- Barra de Navegação Interna do Faturista -->
       <div class="bg-white rounded-xl p-2 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-2">
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
           <button id="tabFatFila" onclick="mudarAbaFaturista('fila')" class="px-4 py-2 rounded-lg text-sm font-bold ifco-green text-white transition flex items-center gap-2">
-            <i class="fa-solid fa-calendar-check"></i> Fila Agendada
+            <i class="fa-solid fa-calendar-check"></i> Fila Brasil
             <span id="badgeCountAgendados" class="bg-white text-[#007A33] text-xs px-2 py-0.5 rounded-full font-extrabold">0</span>
           </button>
           <button id="tabFatCadastrar" onclick="mudarAbaFaturista('cadastrar')" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
@@ -104,16 +103,16 @@
         </button>
       </div>
 
-      <!-- SUB-TELA FATURISTA 1: FILA DE PEDIDOS AGENDADOS -->
+      <!-- SUB-TELA FATURISTA 1: FILA DE PEDIDOS AGENDADOS (TODAS AS FILIAIS) -->
       <div id="fatSubFila" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 class="font-extrabold text-base text-slate-800">Pedidos Agendados para Atendimento</h2>
+            <h2 class="font-extrabold text-base text-slate-800">Pedidos Agendados — Visão Geral (Todas as Filiais)</h2>
             <p class="text-xs text-slate-500">Clique em <strong>Iniciar Atendimento</strong> assim que o motorista se apresentar</p>
           </div>
-          <div class="relative w-full sm:w-64">
+          <div class="relative w-full sm:w-72">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input id="buscaAgendados" onkeyup="renderizarTabelaAgendados()" type="text" placeholder="Buscar pedido ou cliente..." class="w-full pl-8 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:border-[#007A33]" />
+            <input id="buscaAgendados" onkeyup="renderizarTabelaAgendados()" type="text" placeholder="Buscar pedido, filial ou cliente..." class="w-full pl-8 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:border-[#007A33]" />
           </div>
         </div>
 
@@ -122,15 +121,14 @@
             <thead>
               <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
                 <th class="py-3 px-4 font-bold">Pedido (ID)</th>
+                <th class="py-3 px-4 font-bold">Filial</th>
                 <th class="py-3 px-4 font-bold">Data / Hora</th>
                 <th class="py-3 px-4 font-bold">Cliente / Solicitante</th>
                 <th class="py-3 px-4 font-bold">Modelo & Quantidade</th>
                 <th class="py-3 px-4 font-bold text-right">Ação</th>
               </tr>
             </thead>
-            <tbody id="tbodyAgendados" class="divide-y divide-slate-200 text-sm">
-              <!-- Preenchido via JS -->
-            </tbody>
+            <tbody id="tbodyAgendados" class="divide-y divide-slate-200 text-sm"></tbody>
           </table>
         </div>
       </div>
@@ -168,18 +166,22 @@
               <i class="fa-solid fa-keyboard mr-1"></i> Opção B: Dados do Agendamento
             </p>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-xs font-bold text-slate-600 mb-1">Nº do Pedido *</label>
                 <input id="cadPedidoId" type="text" placeholder="Ex: 6917" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none" />
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Data / Hora Agendada</label>
-                <input id="cadDataHora" type="text" placeholder="Ex: 25/11 08:30" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm focus:outline-none" />
+                <label class="block text-xs font-bold text-slate-600 mb-1">Filial de Expedição * (Digitação Livre)</label>
+                <input id="cadFilial" type="text" placeholder="Ex: AMERICANA" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold uppercase focus:outline-none" />
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-600 mb-1">Cliente / Solicitante *</label>
                 <input id="cadCliente" type="text" placeholder="Ex: CITRICA BARDIN" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Data / Hora Agendada</label>
+                <input id="cadDataHora" type="text" placeholder="Ex: 25/11 08:30" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm focus:outline-none" />
               </div>
             </div>
 
@@ -194,7 +196,6 @@
                 </button>
               </div>
 
-              <!-- Lista de itens adicionados -->
               <div id="listaItensCadastro" class="space-y-1.5">
                 <p class="text-xs text-slate-400 italic">Nenhum item adicionado ainda.</p>
               </div>
@@ -212,22 +213,25 @@
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-5">
           <div class="flex items-start justify-between border-b border-slate-100 pb-4">
             <div>
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 mb-2">
-                <i class="fa-solid fa-clock"></i> Atendimento em Andamento • Chegada: <span id="ativoHoraInicio">--:--</span>
-              </span>
+              <div class="flex flex-wrap items-center gap-2 mb-2">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                  <i class="fa-solid fa-clock"></i> Chegada: <span id="ativoHoraInicio">--:--</span>
+                </span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-slate-800 text-white">
+                  <i class="fa-solid fa-location-dot text-emerald-400"></i> <span id="ativoFilialBadge">---</span>
+                </span>
+              </div>
               <h2 class="text-xl font-extrabold text-slate-800">Pedido #<span id="ativoPedidoId">---</span></h2>
               <p id="ativoClienteNome" class="text-sm font-semibold text-slate-600 mt-0.5">---</p>
             </div>
             <button onclick="mudarAbaFaturista('fila')" class="text-xs text-slate-500 hover:text-slate-800 underline">Voltar à fila</button>
           </div>
 
-          <!-- Resumo dos Itens do Pedido -->
           <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
             <p class="text-xs font-bold uppercase text-slate-500 mb-2">Itens do Pedido</p>
             <div id="ativoItensResumo" class="text-sm font-bold text-slate-800 space-y-1"></div>
           </div>
 
-          <!-- Campo de Bipagem da NF -->
           <div class="space-y-2">
             <label class="block text-sm font-extrabold text-slate-700">
               <i class="fa-solid fa-barcode mr-1 ifco-text"></i> Bipar ou Digitar Número da Nota Fiscal (NF-e) *
@@ -243,24 +247,38 @@
 
     </section>
 
-    <!-- ==================== MÓDULO OPERADOR LOGÍSTICO ==================== -->
+    <!-- ==================== MÓDULO OPERADOR LOGÍSTICO (FILTRADO POR FILIAL) ==================== -->
     <section id="viewOperador" class="hidden max-w-2xl mx-auto space-y-4">
 
-      <!-- Tela Lista de Pedidos Aguardando na Doca -->
+      <!-- Banner de Identificação da Filial Logada -->
+      <div class="bg-[#16202A] text-white rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-[#2AD182] flex items-center justify-center">
+            <i class="fa-solid fa-warehouse"></i>
+          </div>
+          <div>
+            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Unidade Logada</p>
+            <p id="opFilialHeader" class="text-sm font-extrabold text-white">AMERICANA</p>
+          </div>
+        </div>
+        <button onclick="trocarFilialOperador()" class="text-xs bg-white/10 hover:bg-white/20 text-slate-200 px-3 py-1.5 rounded-lg font-bold transition">
+          <i class="fa-solid fa-right-from-bracket mr-1"></i> Trocar Filial
+        </button>
+      </div>
+
+      <!-- Tela Lista de Pedidos Aguardando na Doca da Filial -->
       <div id="opListaContainer" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
             <h2 class="text-lg font-extrabold text-slate-800">Fila de Carregamento (Doca)</h2>
-            <p class="text-xs text-slate-500">Pedidos faturados aguardando separação</p>
+            <p class="text-xs text-slate-500">Exibindo somente pedidos faturados desta filial</p>
           </div>
           <button onclick="carregarDados()" class="text-xs font-bold ifco-text bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200">
             <i class="fa-solid fa-rotate mr-1"></i> Atualizar
           </button>
         </div>
 
-        <div id="opListaPedidos" class="space-y-3">
-          <!-- Cards da fila do operador -->
-        </div>
+        <div id="opListaPedidos" class="space-y-3"></div>
       </div>
 
       <!-- Tela Romaneio Digital & Execução do Operador -->
@@ -274,13 +292,11 @@
           <button onclick="fecharRomaneioOperador()" class="text-xs text-slate-500 underline">Voltar</button>
         </div>
 
-        <!-- Checklist de Separação -->
         <div class="space-y-2">
           <p class="text-xs font-bold uppercase text-slate-500">Toque nos itens conforme separar:</p>
           <div id="opChecklistItens" class="space-y-2"></div>
         </div>
 
-        <!-- Comprovação Fotográfica -->
         <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
           <label class="block text-xs font-extrabold text-slate-700 uppercase">
             <i class="fa-solid fa-camera mr-1"></i> Comprovação (Foto da Carga / Canhoto)
@@ -289,27 +305,16 @@
           <p id="opFotoStatus" class="text-xs text-emerald-700 font-semibold hidden"><i class="fa-solid fa-check"></i> Foto registrada com sucesso!</p>
         </div>
 
-        <!-- Avaliação NPS do Motorista (1 a 5 Estrelas) -->
         <div class="bg-emerald-50/60 p-5 rounded-xl border border-emerald-200 text-center space-y-3">
           <p class="text-sm font-extrabold text-slate-800">Avaliação do Motorista (Atendimento Pátio)</p>
           <p class="text-xs text-slate-500">Toque nas estrelas de 1 a 5 para avaliar</p>
           
           <div class="flex justify-center items-center gap-3 py-1" id="npsStarsContainer">
-            <button type="button" onclick="selecionarEstrelas(1)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none">
-              <i class="fa-solid fa-star"></i>
-            </button>
-            <button type="button" onclick="selecionarEstrelas(2)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none">
-              <i class="fa-solid fa-star"></i>
-            </button>
-            <button type="button" onclick="selecionarEstrelas(3)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none">
-              <i class="fa-solid fa-star"></i>
-            </button>
-            <button type="button" onclick="selecionarEstrelas(4)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none">
-              <i class="fa-solid fa-star"></i>
-            </button>
-            <button type="button" onclick="selecionarEstrelas(5)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none">
-              <i class="fa-solid fa-star"></i>
-            </button>
+            <button type="button" onclick="selecionarEstrelas(1)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="selecionarEstrelas(2)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="selecionarEstrelas(3)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="selecionarEstrelas(4)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="selecionarEstrelas(5)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none"><i class="fa-solid fa-star"></i></button>
           </div>
 
           <p id="npsLabelTexto" class="text-xs font-extrabold text-[#007A33] h-4"></p>
@@ -322,19 +327,109 @@
 
     </section>
 
+    <!-- ==================== MÓDULO RELATÓRIO DE ATENDIMENTOS (ÁREA RESTRITA) ==================== -->
+    <section id="viewRelatorio" class="hidden space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg ifco-green text-white flex items-center justify-center text-sm shadow-xs">
+            <i class="fa-solid fa-table-cells"></i>
+          </div>
+          <h2 class="text-lg sm:text-xl font-extrabold text-slate-800">Relatório de Atendimentos (Google Sheets)</h2>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <a id="linkPlanilhaDireto" href="https://docs.google.com/spreadsheets" target="_blank" class="ifco-green hover:ifco-green-dark text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-xs transition inline-flex items-center gap-1.5">
+            <i class="fa-solid fa-file-excel"></i> Abrir Google Sheets
+          </a>
+          <button onclick="carregarDados()" class="bg-[#16202A] hover:bg-slate-800 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-xs transition inline-flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate"></i> Atualizar
+          </button>
+          <button onclick="voltarMenu()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-3.5 py-2.5 rounded-xl transition inline-flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-left"></i> Voltar
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-3.5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/70">
+          <span class="text-xs font-bold text-slate-500">
+            Total de registros exibidos: <strong id="relatorioCount" class="text-slate-800">0</strong>
+          </span>
+          <div class="relative w-full sm:w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input id="buscaRelatorio" onkeyup="renderizarRelatorio()" type="text" placeholder="Filtrar por pedido, filial, cliente ou NF..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#007A33]" />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 text-xs font-extrabold border-b border-slate-200">
+                <th class="py-3.5 px-4">Pedido</th>
+                <th class="py-3.5 px-4">Filial</th>
+                <th class="py-3.5 px-4">NF</th>
+                <th class="py-3.5 px-4">Itens / Romaneio</th>
+                <th class="py-3.5 px-4">Status</th>
+                <th class="py-3.5 px-4">Chegada</th>
+                <th class="py-3.5 px-4">Fim Faturamento</th>
+                <th class="py-3.5 px-4">Início Separação</th>
+                <th class="py-3.5 px-4">Fim Carreg.</th>
+                <th class="py-3.5 px-4 text-center">Avaliação</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyRelatorio" class="divide-y divide-slate-200 text-xs"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <!-- MODAL ÁREA RESTRITA (PLANILHA / RELATÓRIO) -->
+  <!-- MODAL LOGIN DO OPERADOR POR FILIAL -->
+  <div id="modalLoginOperador" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-xs items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-lg bg-slate-800 text-white flex items-center justify-center">
+            <i class="fa-solid fa-warehouse"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-slate-800">Acesso Operador Doca</h3>
+            <p class="text-xs text-slate-500">Informe sua filial para filtrar a fila</p>
+          </div>
+        </div>
+        <button onclick="fecharModalLoginOperador()" class="text-slate-400 hover:text-slate-700 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Filial (Digitação Livre)</label>
+          <input id="inputLoginFilial" type="text" placeholder="Ex: AMERICANA" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold uppercase focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Senha da Filial</label>
+          <input id="inputSenhaFilial" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter') validarLoginOperador()" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold tracking-widest focus:outline-none" />
+        </div>
+        <button onclick="validarLoginOperador()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-3 rounded-xl text-sm transition">
+          Entrar na Fila da Filial
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE SENHA DA ÁREA RESTRITA -->
   <div id="modalRestrito" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-xs items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-lg bg-[#16202A] text-[#2AD182] flex items-center justify-center">
             <i class="fa-solid fa-lock"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-base text-slate-800">Acesso à Gestão / Relatórios</h3>
-            <p class="text-xs text-slate-500">Área restrita à supervisão e faturamento</p>
+            <h3 class="font-extrabold text-base text-slate-800">Área Restrita</h3>
+            <p class="text-xs text-slate-500">Relatório e Planilha Gerencial</p>
           </div>
         </div>
         <button onclick="fecharModalRestrito()" class="text-slate-400 hover:text-slate-700 text-lg">
@@ -342,28 +437,12 @@
         </button>
       </div>
 
-      <!-- Tela de Senha -->
-      <div id="restritoSenhaBox" class="space-y-3">
+      <div class="space-y-3">
         <label class="block text-xs font-bold text-slate-600">Digite a senha de acesso:</label>
         <input id="inputSenhaRestrita" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter') validarSenhaRestrita()" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-4 py-3 text-center text-lg font-extrabold tracking-widest focus:outline-none" />
         <button onclick="validarSenhaRestrita()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-3 rounded-xl text-sm transition">
-          Desbloquear Painel
+          Acessar Relatório
         </button>
-      </div>
-
-      <!-- Conteúdo Liberado -->
-      <div id="restritoConteudoBox" class="hidden space-y-3">
-        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center space-y-2">
-          <p class="text-xs font-bold text-emerald-800">Acesso autorizado! Escolha onde deseja abrir:</p>
-          <a id="linkPlanilhaDireto" href="https://docs.google.com/spreadsheets" target="_blank" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm transition">
-            <i class="fa-solid fa-file-excel"></i> Abrir Planilha Google Sheets
-          </a>
-        </div>
-
-        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 text-xs text-slate-600 flex justify-between">
-          <span>Total de registros na base:</span>
-          <strong id="restritoTotalRegistros" class="text-slate-800">0</strong>
-        </div>
       </div>
     </div>
   </div>
@@ -376,25 +455,44 @@
 
   <script>
     // =========================================================================
-    // CONFIGURAÇÃO E ESTADO GLOBAL (V2 ISOLADA)
+    // CONFIGURAÇÃO E ESTADO GLOBAL (V3 MULTI-FILIAL PROTÓTIPO)
     // =========================================================================
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaSH6HpGUX27waLqdqUN8V4DAKvR4kSqLhkDlBTcdgycF7Bz0WZIvAWgpuZEA2Dq8o/exec";
-    const PLANILHA_URL = "https://docs.google.com/spreadsheets"; // Cole aqui o link exato da sua planilha V2 se quiser abrir direto nela
+    const PLANILHA_URL = "https://docs.google.com/spreadsheets";
     const SENHA_GESTAO = "ifco2026";
+
+    // Senhas específicas por filial (normalizadas sem acento/maiúsculas).
+    // Qualquer filial nova digitada no protótipo usa a senha padrão "ifco2026".
+    const SENHAS_FILIAIS = {
+      "AMERICANA": "am2026",
+      "JUNDIAI": "ju2026",
+      "CAJAMAR": "ca2026",
+      "BETIM": "be2026",
+      "DEFAULT": "ifco2026"
+    };
 
     let todosPedidos = [];
     let itensCadastroTemp = [];
     let pedidoAtivoFaturista = null;
     let pedidoAtivoOperador = null;
+    let filialOperadorLogada = "";
     let npsSelecionado = "";
     let fotoBase64Resumo = "";
     let qrScannerAgenda = null;
+
+    // Normaliza texto (remove acentos, espaços extras e deixa em maiúsculas)
+    function normalizarTexto(txt) {
+      return String(txt || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toUpperCase();
+    }
 
     // Inicialização
     window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("linkPlanilhaDireto").href = PLANILHA_URL;
 
-      // Preenche data/hora sugerida no cadastro manual
       const agora = new Date();
       const dia = String(agora.getDate()).padStart(2, '0');
       const mes = String(agora.getMonth() + 1).padStart(2, '0');
@@ -402,13 +500,16 @@
       const min = String(agora.getMinutes()).padStart(2, '0');
       document.getElementById("cadDataHora").value = `${dia}/${mes} ${hora}:${min}`;
 
-      // Recupera sessão do operador V2 se a tela do celular bloqueou
-      const savedOp = localStorage.getItem("ifco_v2_op_ativo");
-      const savedPerfil = localStorage.getItem("ifco_v2_perfil_atual");
+      const savedOp = localStorage.getItem("ifco_v3_op_ativo");
+      const savedPerfil = localStorage.getItem("ifco_v3_perfil_atual");
+      const savedFilial = localStorage.getItem("ifco_v3_filial_op");
 
-      if (savedPerfil) {
-        abrirPerfil(savedPerfil, true);
-        if (savedPerfil === "operador" && savedOp) {
+      if (savedPerfil === "faturista") {
+        abrirPerfil("faturista");
+      } else if (savedPerfil === "operador" && savedFilial) {
+        filialOperadorLogada = savedFilial;
+        abrirPerfil("operador");
+        if (savedOp) {
           pedidoAtivoOperador = JSON.parse(savedOp);
           abrirRomaneioOperador(pedidoAtivoOperador, true);
         }
@@ -416,12 +517,64 @@
     });
 
     // =========================================================================
-    // ÁREA RESTRITA (PLANILHA / RELATÓRIO)
+    // LOGIN DO OPERADOR POR FILIAL
+    // =========================================================================
+    function abrirModalLoginOperador() {
+      const savedFilial = localStorage.getItem("ifco_v3_filial_op");
+      if (savedFilial) {
+        filialOperadorLogada = savedFilial;
+        abrirPerfil("operador");
+        return;
+      }
+      document.getElementById("inputLoginFilial").value = "";
+      document.getElementById("inputSenhaFilial").value = "";
+      const modal = document.getElementById("modalLoginOperador");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      setTimeout(() => document.getElementById("inputLoginFilial").focus(), 100);
+    }
+
+    function fecharModalLoginOperador() {
+      const modal = document.getElementById("modalLoginOperador");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    function validarLoginOperador() {
+      const filialDigitada = document.getElementById("inputLoginFilial").value.trim().toUpperCase();
+      const senhaDigitada = document.getElementById("inputSenhaFilial").value.trim();
+
+      if (!filialDigitada) {
+        return mostrarToast("Informe o nome da filial!", true);
+      }
+
+      const chave = normalizarTexto(filialDigitada);
+      const senhaEsperada = SENHAS_FILIAIS[chave] || SENHAS_FILIAIS["DEFAULT"];
+
+      if (senhaDigitada !== senhaEsperada) {
+        return mostrarToast("Senha incorreta para esta filial!", true);
+      }
+
+      filialOperadorLogada = filialDigitada;
+      localStorage.setItem("ifco_v3_filial_op", filialDigitada);
+      fecharModalLoginOperador();
+      abrirPerfil("operador");
+    }
+
+    function trocarFilialOperador() {
+      localStorage.removeItem("ifco_v3_filial_op");
+      localStorage.removeItem("ifco_v3_op_ativo");
+      filialOperadorLogada = "";
+      pedidoAtivoOperador = null;
+      document.getElementById("viewOperador").classList.add("hidden");
+      abrirModalLoginOperador();
+    }
+
+    // =========================================================================
+    // ÁREA RESTRITA (SENHA -> ABRE TELA DE RELATÓRIO)
     // =========================================================================
     function abrirModalRestrito() {
       document.getElementById("inputSenhaRestrita").value = "";
-      document.getElementById("restritoSenhaBox").classList.remove("hidden");
-      document.getElementById("restritoConteudoBox").classList.add("hidden");
       const modal = document.getElementById("modalRestrito");
       modal.classList.remove("hidden");
       modal.classList.add("flex");
@@ -439,18 +592,83 @@
       if (digitada !== SENHA_GESTAO) {
         return mostrarToast("Senha incorreta!", true);
       }
-      document.getElementById("restritoSenhaBox").classList.add("hidden");
-      document.getElementById("restritoConteudoBox").classList.remove("hidden");
-      if (todosPedidos.length === 0) await carregarDados();
-      document.getElementById("restritoTotalRegistros").textContent = todosPedidos.length;
+      fecharModalRestrito();
+      document.getElementById("viewMenu").classList.add("hidden");
+      document.getElementById("viewFaturista").classList.add("hidden");
+      document.getElementById("viewOperador").classList.add("hidden");
+      document.getElementById("viewRelatorio").classList.remove("hidden");
+      document.getElementById("btnMenuTop").classList.remove("hidden");
+      await carregarDados();
+    }
+
+    function renderizarRelatorio() {
+      const tbody = document.getElementById("tbodyRelatorio");
+      const termo = (document.getElementById("buscaRelatorio").value || "").toLowerCase();
+
+      const filtrados = todosPedidos.filter(p => {
+        if (!termo) return true;
+        return (
+          String(p.pedido || "").toLowerCase().includes(termo) ||
+          String(p.filial || "").toLowerCase().includes(termo) ||
+          String(p.cliente || "").toLowerCase().includes(termo) ||
+          String(p.nf || "").toLowerCase().includes(termo) ||
+          String(p.itens || "").toLowerCase().includes(termo) ||
+          String(p.status || "").toLowerCase().includes(termo)
+        );
+      });
+
+      document.getElementById("relatorioCount").textContent = filtrados.length;
+
+      if (filtrados.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="10" class="py-10 text-center text-slate-400 text-sm">
+              Nenhum registro encontrado na planilha.
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtrados.map(p => {
+        const st = (p.status || "").toLowerCase();
+        let badgeClass = "bg-slate-100 text-slate-700";
+        if (st === "concluído" || st === "concluido") badgeClass = "bg-emerald-100 text-emerald-800";
+        else if (st === "agendado") badgeClass = "bg-blue-100 text-blue-800";
+        else if (st.includes("faturamento") || st.includes("separação")) badgeClass = "bg-amber-100 text-amber-800";
+
+        const pedidoCliente = p.cliente ? `${p.pedido} - ${p.cliente}` : `#${p.pedido}`;
+        const npsVal = p.nps ? `${p.nps} ★` : "-";
+
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-3.5 px-4 font-extrabold text-slate-800 max-w-[160px]">${pedidoCliente}</td>
+            <td class="py-3.5 px-4 whitespace-nowrap">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-white text-[10px] font-extrabold uppercase">${p.filial || "-"}</span>
+            </td>
+            <td class="py-3.5 px-4 font-semibold text-[#007A33] break-all max-w-[200px]">${p.nf || "-"}</td>
+            <td class="py-3.5 px-4 font-medium text-slate-700 max-w-[160px]">${p.itens || "-"}</td>
+            <td class="py-3.5 px-4 whitespace-nowrap">
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold ${badgeClass}">
+                ${p.status || "-"}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">${p.t_inicio || "-"}</td>
+            <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">${p.t_nf || "-"}</td>
+            <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">${p.t_sep_ini || "-"}</td>
+            <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">${p.t_fim || "-"}</td>
+            <td class="py-3.5 px-4 text-center font-extrabold text-amber-500 whitespace-nowrap">${npsVal}</td>
+          </tr>
+        `;
+      }).join("");
     }
 
     // =========================================================================
     // NAVEGAÇÃO ENTRE PERFIS
     // =========================================================================
     function abrirPerfil(perfil) {
-      localStorage.setItem("ifco_v2_perfil_atual", perfil);
+      localStorage.setItem("ifco_v3_perfil_atual", perfil);
       document.getElementById("viewMenu").classList.add("hidden");
+      document.getElementById("viewRelatorio").classList.add("hidden");
       document.getElementById("btnMenuTop").classList.remove("hidden");
 
       if (perfil === "faturista") {
@@ -458,6 +676,7 @@
         document.getElementById("viewOperador").classList.add("hidden");
         mudarAbaFaturista("fila");
       } else {
+        document.getElementById("opFilialHeader").textContent = filialOperadorLogada;
         document.getElementById("viewOperador").classList.remove("hidden");
         document.getElementById("viewFaturista").classList.add("hidden");
       }
@@ -467,10 +686,11 @@
 
     function voltarMenu() {
       pararQrAgenda();
-      localStorage.removeItem("ifco_v2_perfil_atual");
+      localStorage.removeItem("ifco_v3_perfil_atual");
       document.getElementById("viewMenu").classList.remove("hidden");
       document.getElementById("viewFaturista").classList.add("hidden");
       document.getElementById("viewOperador").classList.add("hidden");
+      document.getElementById("viewRelatorio").classList.add("hidden");
       document.getElementById("btnMenuTop").classList.add("hidden");
     }
 
@@ -485,6 +705,7 @@
         todosPedidos = Array.isArray(data) ? data : [];
         renderizarTabelaAgendados();
         renderizarFilaOperador();
+        renderizarRelatorio();
       } catch (err) {
         console.error(err);
         mostrarToast("Erro ao buscar dados da planilha", true);
@@ -513,7 +734,7 @@
     }
 
     // =========================================================================
-    // LÓGICA DO FATURISTA (AGENDA + CADASTRO + TELA NF)
+    // LÓGICA DO FATURISTA (HUB BRASIL: VÊ TODAS AS FILIAIS)
     // =========================================================================
     function mudarAbaFaturista(aba) {
       pararQrAgenda();
@@ -549,6 +770,7 @@
         const matchStatus = st === "agendado" || st === "em faturamento";
         const matchBusca = !termo ||
           String(p.pedido).toLowerCase().includes(termo) ||
+          String(p.filial).toLowerCase().includes(termo) ||
           String(p.cliente).toLowerCase().includes(termo) ||
           String(p.itens).toLowerCase().includes(termo);
         return matchStatus && matchBusca;
@@ -559,7 +781,7 @@
       if (agendados.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="5" class="py-10 text-center text-slate-400 text-sm">
+            <td colspan="6" class="py-10 text-center text-slate-400 text-sm">
               <i class="fa-regular fa-calendar-xmark text-2xl mb-2 block"></i>
               Nenhum pedido agendado aguardando no momento.<br/>
               <button onclick="mudarAbaFaturista('cadastrar')" class="mt-2 text-xs font-bold ifco-text underline">+ Cadastrar novo agendamento</button>
@@ -573,6 +795,11 @@
         return `
           <tr class="hover:bg-slate-50 transition">
             <td class="py-3.5 px-4 font-extrabold text-slate-800">#${p.pedido}</td>
+            <td class="py-3.5 px-4">
+              <span class="inline-block bg-slate-800 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-md uppercase">
+                ${p.filial || "GERAL"}
+              </span>
+            </td>
             <td class="py-3.5 px-4 text-xs font-semibold text-slate-600">${p.agendamento || "Hoje"}</td>
             <td class="py-3.5 px-4 font-bold text-slate-800">${p.cliente || "Cliente não informado"}</td>
             <td class="py-3.5 px-4">
@@ -592,7 +819,6 @@
       }).join("");
     }
 
-    // Cadastro de Itens na Tela de Agendamento (Digitação Livre)
     function adicionarItemCadastro() {
       const modelo = document.getElementById("cadModeloInput").value.trim().toUpperCase();
       const qtd = document.getElementById("cadQtdInput").value;
@@ -627,11 +853,12 @@
 
     async function salvarAgendamento() {
       const pedido = document.getElementById("cadPedidoId").value.trim();
+      const filial = document.getElementById("cadFilial").value.trim().toUpperCase();
       const agendamento = document.getElementById("cadDataHora").value.trim();
       const cliente = document.getElementById("cadCliente").value.trim();
 
-      if (!pedido || !cliente) {
-        return mostrarToast("Preencha o Nº do Pedido e o Cliente", true);
+      if (!pedido || !filial || !cliente) {
+        return mostrarToast("Preencha Pedido, Filial e Cliente!", true);
       }
       if (itensCadastroTemp.length === 0) {
         return mostrarToast("Adicione pelo menos um modelo e quantidade", true);
@@ -642,6 +869,7 @@
       const ok = await enviarPost({
         action: "agendar",
         pedido,
+        filial,
         agendamento,
         cliente,
         itens: itensFormatado
@@ -651,24 +879,25 @@
         todosPedidos.unshift({
           pedido,
           status: "Agendado",
+          filial,
           agendamento,
           cliente,
           itens: itensFormatado
         });
 
         document.getElementById("cadPedidoId").value = "";
+        document.getElementById("cadFilial").value = "";
         document.getElementById("cadCliente").value = "";
         itensCadastroTemp = [];
         renderizarItensCadastro();
 
-        mostrarToast("Agendamento registrado na fila!");
+        mostrarToast(`Agendamento registrado para ${filial}!`);
         mudarAbaFaturista("fila");
         renderizarTabelaAgendados();
         setTimeout(carregarDados, 1500);
       }
     }
 
-    // Leitor de QR Code na Tela de Agendamento
     function toggleQrAgenda() {
       const container = document.getElementById("qrReaderAgendaContainer");
       if (!container.classList.contains("hidden")) {
@@ -706,6 +935,7 @@
       try {
         const obj = JSON.parse(texto);
         if (obj.pedido) document.getElementById("cadPedidoId").value = obj.pedido;
+        if (obj.filial) document.getElementById("cadFilial").value = obj.filial.toUpperCase();
         if (obj.cliente) document.getElementById("cadCliente").value = obj.cliente;
         if (obj.itens && Array.isArray(obj.itens)) {
           itensCadastroTemp = obj.itens;
@@ -715,16 +945,16 @@
       } catch (e) {
         const matchNum = texto.match(/\d{4,10}/);
         document.getElementById("cadPedidoId").value = matchNum ? matchNum[0] : texto;
-        mostrarToast("Código lido! Complete cliente/itens e registre.");
+        mostrarToast("Código lido! Complete filial/cliente e registre.");
       }
     }
 
-    // Iniciar Atendimento -> Grava chegada e abre Tela 2 (NF)
     async function iniciarAtendimento(pedidoObj) {
       const agoraStr = horaAtualFormatada();
       pedidoAtivoFaturista = { ...pedidoObj, t_inicio: pedidoObj.t_inicio || agoraStr };
 
       document.getElementById("ativoPedidoId").textContent = pedidoAtivoFaturista.pedido;
+      document.getElementById("ativoFilialBadge").textContent = pedidoAtivoFaturista.filial || "GERAL";
       document.getElementById("ativoClienteNome").textContent = pedidoAtivoFaturista.cliente || "Cliente";
       document.getElementById("ativoHoraInicio").textContent = pedidoAtivoFaturista.t_inicio;
       document.getElementById("ativoItensResumo").textContent = pedidoAtivoFaturista.itens || "-";
@@ -769,9 +999,10 @@
             ? { ...p, status: "Aguardando Separação", nf, t_nf: tNf }
             : p
         );
+        const filialDestino = pedidoAtivoFaturista.filial || "Doca";
         pedidoAtivoFaturista = null;
         document.getElementById("tabFatAtivo").classList.add("hidden");
-        mostrarToast("NF registrada! Pedido enviado para a Doca.");
+        mostrarToast(`NF registrada! Enviado para a doca de ${filialDestino}.`);
         mudarAbaFaturista("fila");
         renderizarTabelaAgendados();
         setTimeout(carregarDados, 1500);
@@ -779,20 +1010,24 @@
     }
 
     // =========================================================================
-    // LÓGICA DO OPERADOR LOGÍSTICO (INTACTA + AVALIAÇÃO POR ESTRELAS)
+    // LÓGICA DO OPERADOR LOGÍSTICO (FILTRADO EXCLUSIVAMENTE PELA FILIAL)
     // =========================================================================
     function renderizarFilaOperador() {
       const container = document.getElementById("opListaPedidos");
+      const filialAlvo = normalizarTexto(filialOperadorLogada);
+
       const fila = todosPedidos.filter(p => {
         const st = (p.status || "").toLowerCase();
-        return st === "aguardando separação" || st === "em separação";
+        const statusValido = st === "aguardando separação" || st === "em separação";
+        const filialPedido = normalizarTexto(p.filial);
+        return statusValido && filialPedido === filialAlvo;
       });
 
       if (fila.length === 0) {
         container.innerHTML = `
           <div class="text-center py-8 text-slate-400 text-sm">
             <i class="fa-solid fa-check-double text-2xl mb-2 block text-emerald-600"></i>
-            Nenhum caminhão aguardando carregamento na doca.
+            Nenhum caminhão aguardando carregamento em <strong>${filialOperadorLogada}</strong>.
           </div>`;
         return;
       }
@@ -817,7 +1052,7 @@
 
     async function abrirRomaneioOperador(pedidoObj, restoring = false) {
       pedidoAtivoOperador = pedidoObj;
-      localStorage.setItem("ifco_v2_op_ativo", JSON.stringify(pedidoObj));
+      localStorage.setItem("ifco_v3_op_ativo", JSON.stringify(pedidoObj));
 
       document.getElementById("opListaContainer").classList.add("hidden");
       document.getElementById("opRomaneioContainer").classList.remove("hidden");
@@ -853,7 +1088,7 @@
     }
 
     function fecharRomaneioOperador() {
-      localStorage.removeItem("ifco_v2_op_ativo");
+      localStorage.removeItem("ifco_v3_op_ativo");
       pedidoAtivoOperador = null;
       document.getElementById("opRomaneioContainer").classList.add("hidden");
       document.getElementById("opListaContainer").classList.remove("hidden");
