@@ -122,7 +122,7 @@
               <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
                 <th class="py-3 px-4 font-bold">Pedido (ID)</th>
                 <th class="py-3 px-4 font-bold">Filial</th>
-                <th class="py-3 px-4 font-bold">Data / Hora</th>
+                <th class="py-3 px-4 font-bold">Data Agendada</th>
                 <th class="py-3 px-4 font-bold">Cliente / Solicitante</th>
                 <th class="py-3 px-4 font-bold">Modelo & Quantidade</th>
                 <th class="py-3 px-4 font-bold text-right">Ação</th>
@@ -180,8 +180,8 @@
                 <input id="cadCliente" type="text" placeholder="Ex: CITRICA BARDIN" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm focus:outline-none" />
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Data / Hora Agendada</label>
-                <input id="cadDataHora" type="text" placeholder="Ex: 25/11 08:30" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm focus:outline-none" />
+                <label class="block text-xs font-bold text-slate-600 mb-1">Data Agendada *</label>
+                <input id="cadData" type="date" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 focus:outline-none" />
               </div>
             </div>
 
@@ -364,17 +364,19 @@
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-100 text-slate-700 text-xs font-extrabold border-b border-slate-200">
-                <th class="py-3.5 px-4">Pedido</th>
-                <th class="py-3.5 px-4">Filial</th>
-                <th class="py-3.5 px-4">NF</th>
-                <th class="py-3.5 px-4">Itens / Romaneio</th>
-                <th class="py-3.5 px-4">Status</th>
-                <th class="py-3.5 px-4">Chegada</th>
-                <th class="py-3.5 px-4">Fim Faturamento</th>
-                <th class="py-3.5 px-4">Início Separação</th>
-                <th class="py-3.5 px-4">Fim Carreg.</th>
-                <th class="py-3.5 px-4 text-center">Avaliação</th>
+              <tr class="bg-slate-100 text-slate-700 text-[11px] uppercase tracking-wider font-extrabold border-b border-slate-200 whitespace-nowrap">
+                <th class="py-3 px-3.5">Pedido / Cliente</th>
+                <th class="py-3 px-3.5">Filial</th>
+                <th class="py-3 px-3.5">Data Agenda</th>
+                <th class="py-3 px-3.5">NF</th>
+                <th class="py-3 px-3.5">Itens / Romaneio</th>
+                <th class="py-3 px-3.5">Status</th>
+                <th class="py-3 px-3.5">Chegada</th>
+                <th class="py-3 px-3.5">Fim Fat.</th>
+                <th class="py-3 px-3.5">Início Sep.</th>
+                <th class="py-3 px-3.5">Fim Carreg.</th>
+                <th class="py-3 px-3.5">Tempo Total</th>
+                <th class="py-3 px-3.5 text-center">Avaliação</th>
               </tr>
             </thead>
             <tbody id="tbodyRelatorio" class="divide-y divide-slate-200 text-xs"></tbody>
@@ -461,8 +463,6 @@
     const PLANILHA_URL = "https://docs.google.com/spreadsheets";
     const SENHA_GESTAO = "ifco2026";
 
-    // Senhas específicas por filial (normalizadas sem acento/maiúsculas).
-    // Qualquer filial nova digitada no protótipo usa a senha padrão "ifco2026".
     const SENHAS_FILIAIS = {
       "AMERICANA": "am2026",
       "JUNDIAI": "ju2026",
@@ -480,25 +480,48 @@
     let fotoBase64Resumo = "";
     let qrScannerAgenda = null;
 
-    // Normaliza texto (remove acentos, espaços extras e deixa em maiúsculas)
+    function strLower(val) {
+      return String(val ?? "").trim().toLowerCase();
+    }
+
     function normalizarTexto(txt) {
-      return String(txt || "")
+      return String(txt ?? "")
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .trim()
         .toUpperCase();
     }
 
-    // Inicialização
+    // Extrai somente HH:mm:ss mesmo se vier "Sat Dec 30 1899 15:43:00..."
+    function limparHoraExibicao(val) {
+      const s = String(val ?? "").trim();
+      if (!s) return "-";
+      const match = s.match(/(\d{2}:\d{2}:\d{2})/);
+      return match ? match[1] : s;
+    }
+
+    // Converte YYYY-MM-DD (input date) para DD/MM/YYYY
+    function formatarDataBr(isoStr) {
+      const s = String(isoStr ?? "").trim();
+      if (!s) return "";
+      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+        const [ano, mes, dia] = s.split("-");
+        return `${dia}/${mes}/${ano}`;
+      }
+      return s;
+    }
+
+    function definirDataHojeInput() {
+      const agora = new Date();
+      const ano = agora.getFullYear();
+      const mes = String(agora.getMonth() + 1).padStart(2, '0');
+      const dia = String(agora.getDate()).padStart(2, '0');
+      document.getElementById("cadData").value = `${ano}-${mes}-${dia}`;
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("linkPlanilhaDireto").href = PLANILHA_URL;
-
-      const agora = new Date();
-      const dia = String(agora.getDate()).padStart(2, '0');
-      const mes = String(agora.getMonth() + 1).padStart(2, '0');
-      const hora = String(agora.getHours()).padStart(2, '0');
-      const min = String(agora.getMinutes()).padStart(2, '0');
-      document.getElementById("cadDataHora").value = `${dia}/${mes} ${hora}:${min}`;
+      definirDataHojeInput();
 
       const savedOp = localStorage.getItem("ifco_v3_op_ativo");
       const savedPerfil = localStorage.getItem("ifco_v3_perfil_atual");
@@ -603,17 +626,17 @@
 
     function renderizarRelatorio() {
       const tbody = document.getElementById("tbodyRelatorio");
-      const termo = (document.getElementById("buscaRelatorio").value || "").toLowerCase();
+      const termo = strLower(document.getElementById("buscaRelatorio").value);
 
       const filtrados = todosPedidos.filter(p => {
         if (!termo) return true;
         return (
-          String(p.pedido || "").toLowerCase().includes(termo) ||
-          String(p.filial || "").toLowerCase().includes(termo) ||
-          String(p.cliente || "").toLowerCase().includes(termo) ||
-          String(p.nf || "").toLowerCase().includes(termo) ||
-          String(p.itens || "").toLowerCase().includes(termo) ||
-          String(p.status || "").toLowerCase().includes(termo)
+          strLower(p.pedido).includes(termo) ||
+          strLower(p.filial).includes(termo) ||
+          strLower(p.cliente).includes(termo) ||
+          strLower(p.nf).includes(termo) ||
+          strLower(p.itens).includes(termo) ||
+          strLower(p.status).includes(termo)
         );
       });
 
@@ -622,7 +645,7 @@
       if (filtrados.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="10" class="py-10 text-center text-slate-400 text-sm">
+            <td colspan="12" class="py-10 text-center text-slate-400 text-sm">
               Nenhum registro encontrado na planilha.
             </td>
           </tr>`;
@@ -630,33 +653,35 @@
       }
 
       tbody.innerHTML = filtrados.map(p => {
-        const st = (p.status || "").toLowerCase();
+        const st = strLower(p.status);
         let badgeClass = "bg-slate-100 text-slate-700";
         if (st === "concluído" || st === "concluido") badgeClass = "bg-emerald-100 text-emerald-800";
         else if (st === "agendado") badgeClass = "bg-blue-100 text-blue-800";
         else if (st.includes("faturamento") || st.includes("separação")) badgeClass = "bg-amber-100 text-amber-800";
 
-        const pedidoCliente = p.cliente ? `${p.pedido} - ${p.cliente}` : `#${p.pedido}`;
+        const pedidoCliente = p.cliente ? `#${p.pedido} • ${p.cliente}` : `#${p.pedido}`;
         const npsVal = p.nps ? `${p.nps} ★` : "-";
 
         return `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="py-3.5 px-4 font-extrabold text-slate-800 max-w-[160px]">${pedidoCliente}</td>
-            <td class="py-3.5 px-4 whitespace-nowrap">
+          <tr class="hover:bg-slate-50 transition whitespace-nowrap">
+            <td class="py-3 px-3.5 font-extrabold text-slate-800">${pedidoCliente}</td>
+            <td class="py-3 px-3.5">
               <span class="px-2 py-0.5 rounded bg-slate-800 text-white text-[10px] font-extrabold uppercase">${p.filial || "-"}</span>
             </td>
-            <td class="py-3.5 px-4 font-semibold text-[#007A33] break-all max-w-[200px]">${p.nf || "-"}</td>
-            <td class="py-3.5 px-4 font-medium text-slate-700 max-w-[160px]">${p.itens || "-"}</td>
-            <td class="py-3.5 px-4 whitespace-nowrap">
+            <td class="py-3 px-3.5 font-semibold text-slate-600">${p.agendamento || "-"}</td>
+            <td class="py-3 px-3.5 font-bold text-[#007A33]">${p.nf || "-"}</td>
+            <td class="py-3 px-3.5 font-medium text-slate-700">${p.itens || "-"}</td>
+            <td class="py-3 px-3.5">
               <span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold ${badgeClass}">
                 ${p.status || "-"}
               </span>
             </td>
-            <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">${p.t_inicio || "-"}</td>
-            <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">${p.t_nf || "-"}</td>
-            <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">${p.t_sep_ini || "-"}</td>
-            <td class="py-3.5 px-4 text-slate-600 whitespace-nowrap">${p.t_fim || "-"}</td>
-            <td class="py-3.5 px-4 text-center font-extrabold text-amber-500 whitespace-nowrap">${npsVal}</td>
+            <td class="py-3 px-3.5 font-mono text-slate-600">${limparHoraExibicao(p.t_inicio)}</td>
+            <td class="py-3 px-3.5 font-mono text-slate-600">${limparHoraExibicao(p.t_nf)}</td>
+            <td class="py-3 px-3.5 font-mono text-slate-600">${limparHoraExibicao(p.t_sep_ini)}</td>
+            <td class="py-3 px-3.5 font-mono text-slate-600">${limparHoraExibicao(p.t_fim)}</td>
+            <td class="py-3 px-3.5 font-extrabold text-slate-800">${p.tempo_total || "-"}</td>
+            <td class="py-3 px-3.5 text-center font-extrabold text-amber-500">${npsVal}</td>
           </tr>
         `;
       }).join("");
@@ -763,16 +788,16 @@
 
     function renderizarTabelaAgendados() {
       const tbody = document.getElementById("tbodyAgendados");
-      const termo = (document.getElementById("buscaAgendados").value || "").toLowerCase();
+      const termo = strLower(document.getElementById("buscaAgendados").value);
 
       const agendados = todosPedidos.filter(p => {
-        const st = (p.status || "").toLowerCase();
+        const st = strLower(p.status);
         const matchStatus = st === "agendado" || st === "em faturamento";
         const matchBusca = !termo ||
-          String(p.pedido).toLowerCase().includes(termo) ||
-          String(p.filial).toLowerCase().includes(termo) ||
-          String(p.cliente).toLowerCase().includes(termo) ||
-          String(p.itens).toLowerCase().includes(termo);
+          strLower(p.pedido).includes(termo) ||
+          strLower(p.filial).includes(termo) ||
+          strLower(p.cliente).includes(termo) ||
+          strLower(p.itens).includes(termo);
         return matchStatus && matchBusca;
       });
 
@@ -791,7 +816,7 @@
       }
 
       tbody.innerHTML = agendados.map(p => {
-        const emAtendimento = (p.status || "").toLowerCase() === "em faturamento";
+        const emAtendimento = strLower(p.status) === "em faturamento";
         return `
           <tr class="hover:bg-slate-50 transition">
             <td class="py-3.5 px-4 font-extrabold text-slate-800">#${p.pedido}</td>
@@ -854,11 +879,12 @@
     async function salvarAgendamento() {
       const pedido = document.getElementById("cadPedidoId").value.trim();
       const filial = document.getElementById("cadFilial").value.trim().toUpperCase();
-      const agendamento = document.getElementById("cadDataHora").value.trim();
+      const dataIso = document.getElementById("cadData").value;
+      const agendamento = formatarDataBr(dataIso);
       const cliente = document.getElementById("cadCliente").value.trim();
 
-      if (!pedido || !filial || !cliente) {
-        return mostrarToast("Preencha Pedido, Filial e Cliente!", true);
+      if (!pedido || !filial || !cliente || !agendamento) {
+        return mostrarToast("Preencha Pedido, Filial, Cliente e Data!", true);
       }
       if (itensCadastroTemp.length === 0) {
         return mostrarToast("Adicione pelo menos um modelo e quantidade", true);
@@ -888,6 +914,7 @@
         document.getElementById("cadPedidoId").value = "";
         document.getElementById("cadFilial").value = "";
         document.getElementById("cadCliente").value = "";
+        definirDataHojeInput();
         itensCadastroTemp = [];
         renderizarItensCadastro();
 
@@ -935,7 +962,7 @@
       try {
         const obj = JSON.parse(texto);
         if (obj.pedido) document.getElementById("cadPedidoId").value = obj.pedido;
-        if (obj.filial) document.getElementById("cadFilial").value = obj.filial.toUpperCase();
+        if (obj.filial) document.getElementById("cadFilial").value = String(obj.filial).toUpperCase();
         if (obj.cliente) document.getElementById("cadCliente").value = obj.cliente;
         if (obj.itens && Array.isArray(obj.itens)) {
           itensCadastroTemp = obj.itens;
@@ -951,7 +978,7 @@
 
     async function iniciarAtendimento(pedidoObj) {
       const agoraStr = horaAtualFormatada();
-      pedidoAtivoFaturista = { ...pedidoObj, t_inicio: pedidoObj.t_inicio || agoraStr };
+      pedidoAtivoFaturista = { ...pedidoObj, t_inicio: limparHoraExibicao(pedidoObj.t_inicio) !== "-" ? limparHoraExibicao(pedidoObj.t_inicio) : agoraStr };
 
       document.getElementById("ativoPedidoId").textContent = pedidoAtivoFaturista.pedido;
       document.getElementById("ativoFilialBadge").textContent = pedidoAtivoFaturista.filial || "GERAL";
@@ -963,7 +990,7 @@
       mudarAbaFaturista("ativo");
       setTimeout(() => document.getElementById("ativoInputNf").focus(), 150);
 
-      if ((pedidoObj.status || "").toLowerCase() === "agendado") {
+      if (strLower(pedidoObj.status) === "agendado") {
         pedidoObj.status = "Em Faturamento";
         pedidoObj.t_inicio = agoraStr;
         renderizarTabelaAgendados();
@@ -1017,7 +1044,7 @@
       const filialAlvo = normalizarTexto(filialOperadorLogada);
 
       const fila = todosPedidos.filter(p => {
-        const st = (p.status || "").toLowerCase();
+        const st = strLower(p.status);
         const statusValido = st === "aguardando separação" || st === "em separação";
         const filialPedido = normalizarTexto(p.filial);
         return statusValido && filialPedido === filialAlvo;
@@ -1070,7 +1097,7 @@
         b.classList.add("text-slate-300");
       });
 
-      const partes = (pedidoObj.itens || "").split("|").map(s => s.trim()).filter(Boolean);
+      const partes = String(pedidoObj.itens || "").split("|").map(s => s.trim()).filter(Boolean);
       document.getElementById("opChecklistItens").innerHTML = partes.map((item) => `
         <label class="flex items-center gap-3 p-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 cursor-pointer">
           <input type="checkbox" class="w-5 h-5 accent-[#007A33]" />
@@ -1078,7 +1105,7 @@
         </label>
       `).join("");
 
-      if (!restoring && (pedidoObj.status || "").toLowerCase() === "aguardando separação") {
+      if (!restoring && strLower(pedidoObj.status) === "aguardando separação") {
         await enviarPost({
           action: "iniciar_separacao",
           pedido: pedidoObj.pedido,
