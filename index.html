@@ -1,4 +1,461 @@
-<script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>IFCO Expedição Nacional</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #f3f6f4; -webkit-tap-highlight-color: transparent; }
+    .ifco-green { background-color: #007A33; }
+    .ifco-green-dark { background-color: #005A25; }
+    .ifco-text { color: #007A33; }
+  </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+  <!-- HEADER GLOBAL -->
+  <header class="ifco-green text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="voltarMenu()">
+        <div class="bg-white text-[#007A33] font-black px-2.5 py-1 rounded text-lg tracking-tighter">IFCO</div>
+        <div>
+          <h1 class="font-bold text-sm sm:text-base leading-tight">IFCO Expedição Inteligente</h1>
+          <p class="text-[11px] text-emerald-100">Hub Central de Faturamento & Controle de Doca</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="syncIndicator" class="hidden text-xs bg-emerald-800 px-2.5 py-1 rounded-full items-center gap-1.5">
+          <i class="fa-solid fa-rotate fa-spin"></i> Sincronizando
+        </span>
+        <button id="btnMenuTop" onclick="voltarMenu()" class="hidden text-xs bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-lg font-semibold transition">
+          <i class="fa-solid fa-house mr-1"></i> Início
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4">
+
+    <!-- ==================== TELA 0: MENU DE PERFIL ==================== -->
+    <section id="viewMenu" class="max-w-3xl mx-auto mt-6 space-y-4">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 text-center">
+        <h2 class="text-xl font-extrabold text-slate-800">Selecione o Posto de Trabalho</h2>
+        <p class="text-sm text-slate-500 mt-1">Escolha a interface operacional para iniciar</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+          <!-- Faturamento (Hub Nacional) -->
+          <button onclick="abrirPerfil('faturista')" class="group p-6 rounded-2xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-center flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-xl ifco-green text-white flex items-center justify-center text-xl mb-3 group-hover:scale-105 transition">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+            <h3 class="font-extrabold text-base text-slate-800">Faturamento</h3>
+            <p class="text-xs text-slate-500 mt-1">Hub Central • Agenda Brasil e registro de NF</p>
+          </button>
+
+          <!-- Operador Logístico (Acesso por Filial) -->
+          <button onclick="abrirModalLoginOperador()" class="group p-6 rounded-2xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-center flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-slate-800 text-white flex items-center justify-center text-xl mb-3 group-hover:scale-105 transition">
+              <i class="fa-solid fa-dolly"></i>
+            </div>
+            <h3 class="font-extrabold text-base text-slate-800">Operador Logístico</h3>
+            <p class="text-xs text-slate-500 mt-1">Fila exclusiva da filial, romaneio e NPS</p>
+          </button>
+
+          <!-- Planilha / Relatório (Área Restrita) -->
+          <button onclick="abrirModalRestrito()" class="group p-6 rounded-2xl bg-[#16202A] hover:bg-[#1e2b38] border-2 border-[#16202A] hover:border-emerald-500 transition text-center flex flex-col items-center justify-center shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/15 text-[#2AD182] flex items-center justify-center text-2xl mb-3 group-hover:scale-105 transition">
+              <i class="fa-solid fa-table-cells-large"></i>
+            </div>
+            <h3 class="font-extrabold text-base text-white">Planilha / Relatório</h3>
+            <span class="mt-2 inline-block bg-[#007A33] text-white text-[11px] font-bold px-3 py-1 rounded-full">
+              Área Restrita
+            </span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO FATURISTA (HUB BRASIL) ==================== -->
+    <section id="viewFaturista" class="hidden max-w-6xl mx-auto space-y-4">
+
+      <!-- Barra de Navegação Interna do Faturista -->
+      <div class="bg-white rounded-xl p-2 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-wrap gap-2">
+          <button id="tabFatFila" onclick="mudarAbaFaturista('fila')" class="px-4 py-2 rounded-lg text-sm font-bold ifco-green text-white transition flex items-center gap-2">
+            <i class="fa-solid fa-calendar-check"></i> Fila Brasil
+            <span id="badgeCountAgendados" class="bg-white text-[#007A33] text-xs px-2 py-0.5 rounded-full font-extrabold">0</span>
+          </button>
+          <button id="tabFatCadastrar" onclick="mudarAbaFaturista('cadastrar')" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
+            <i class="fa-solid fa-plus-circle"></i> Cadastrar Agendamento
+          </button>
+          <button id="tabFatAtivo" onclick="mudarAbaFaturista('ativo')" class="hidden px-4 py-2 rounded-lg text-sm font-bold bg-amber-500 text-white transition flex items-center gap-2">
+            <i class="fa-solid fa-bolt"></i> Atendimento Ativo
+          </button>
+        </div>
+
+        <button onclick="carregarDados()" class="text-xs font-semibold text-slate-600 hover:text-[#007A33] px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
+          <i class="fa-solid fa-arrows-rotate mr-1"></i> Atualizar Lista
+        </button>
+      </div>
+
+      <!-- SUB-TELA FATURISTA 1: FILA DE PEDIDOS AGENDADOS (TODAS AS FILIAIS) -->
+      <div id="fatSubFila" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="font-extrabold text-base text-slate-800">Pedidos Agendados — Visão Geral (Todas as Filiais)</h2>
+            <p class="text-xs text-slate-500">Clique em <strong>Iniciar Atendimento</strong> assim que o motorista se apresentar</p>
+          </div>
+          <div class="relative w-full sm:w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input id="buscaAgendados" onkeyup="renderizarTabelaAgendados()" type="text" placeholder="Buscar pedido, filial ou cliente..." class="w-full pl-8 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:border-[#007A33]" />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3 px-4 font-bold">Pedido (ID)</th>
+                <th class="py-3 px-4 font-bold">Filial</th>
+                <th class="py-3 px-4 font-bold">Data Agendada</th>
+                <th class="py-3 px-4 font-bold">Cliente / Solicitante</th>
+                <th class="py-3 px-4 font-bold">Modelo & Quantidade</th>
+                <th class="py-3 px-4 font-bold text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyAgendados" class="divide-y divide-slate-200 text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUB-TELA FATURISTA 2: CADASTRAR AGENDAMENTO / PEDIDO -->
+      <div id="fatSubCadastrar" class="hidden max-w-3xl mx-auto space-y-4">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-5">
+          <div class="border-b border-slate-100 pb-3">
+            <span class="text-xs font-extrabold uppercase tracking-wider ifco-text">Pré-Cadastro de Expedição</span>
+            <h2 class="text-lg font-extrabold text-slate-800">Registrar Pedido Agendado</h2>
+          </div>
+
+          <!-- OPÇÃO A: LER QR CODE -->
+          <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-4 space-y-3">
+            <p class="text-xs font-extrabold uppercase tracking-wide text-[#007A33]">
+              <i class="fa-solid fa-qrcode mr-1"></i> Opção A: Ler QR Code do Pedido (App IFCO / Motorista)
+            </p>
+            <button id="btnAbrirQrAgenda" onclick="toggleQrAgenda()" class="w-full ifco-green hover:ifco-green-dark text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+              <i class="fa-solid fa-camera"></i> <span id="txtBtnQrAgenda">Abrir Leitor de QR Code</span>
+            </button>
+            <div id="qrReaderAgendaContainer" class="hidden rounded-xl overflow-hidden border-2 border-[#007A33] bg-black">
+              <div id="qrReaderAgenda" class="w-full"></div>
+            </div>
+          </div>
+
+          <div class="relative flex py-1 items-center">
+            <div class="flex-grow border-t border-slate-200"></div>
+            <span class="flex-shrink mx-3 text-[11px] font-bold uppercase text-slate-400">Ou digitação manual</span>
+            <div class="flex-grow border-t border-slate-200"></div>
+          </div>
+
+          <!-- OPÇÃO B: DIGITAÇÃO MANUAL -->
+          <div class="space-y-4">
+            <p class="text-xs font-extrabold uppercase tracking-wide text-slate-700">
+              <i class="fa-solid fa-keyboard mr-1"></i> Opção B: Dados do Agendamento
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Nº do Pedido *</label>
+                <input id="cadPedidoId" type="text" placeholder="Ex: 6917" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Filial de Expedição * (Digitação Livre)</label>
+                <input id="cadFilial" type="text" placeholder="Ex: AMERICANA" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold uppercase focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Cliente / Solicitante *</label>
+                <input id="cadCliente" type="text" placeholder="Ex: CITRICA BARDIN" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Data Agendada *</label>
+                <input id="cadData" type="date" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 focus:outline-none" />
+              </div>
+            </div>
+
+            <!-- Adição de Modelos e Quantidades (DIGITAÇÃO LIVRE) -->
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <label class="block text-xs font-bold text-slate-700">Modelos e Quantidades de Caixas *</label>
+              <div class="flex flex-col sm:flex-row gap-2">
+                <input id="cadModeloInput" type="text" placeholder="Modelo (ex: 6413)" onkeydown="if(event.key==='Enter') adicionarItemCadastro()" class="flex-1 border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-sm font-bold uppercase focus:outline-none focus:border-[#007A33]" />
+                <input id="cadQtdInput" type="number" min="1" placeholder="Qtd (ex: 500)" onkeydown="if(event.key==='Enter') adicionarItemCadastro()" class="w-full sm:w-36 border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:border-[#007A33]" />
+                <button onclick="adicionarItemCadastro()" type="button" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition">
+                  <i class="fa-solid fa-plus mr-1"></i> Adicionar
+                </button>
+              </div>
+
+              <div id="listaItensCadastro" class="space-y-1.5">
+                <p class="text-xs text-slate-400 italic">Nenhum item adicionado ainda.</p>
+              </div>
+            </div>
+
+            <button onclick="salvarAgendamento()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-3.5 px-6 rounded-xl text-base shadow-md transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-check-circle"></i> Registrar Agendamento
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-TELA FATURISTA 3: TELA DE NF (ATENDIMENTO ATIVO) -->
+      <div id="fatSubAtivo" class="hidden max-w-2xl mx-auto">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-5">
+          <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+            <div>
+              <div class="flex flex-wrap items-center gap-2 mb-2">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
+                  <i class="fa-solid fa-clock"></i> Chegada: <span id="ativoHoraInicio">--:--</span>
+                </span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-slate-800 text-white">
+                  <i class="fa-solid fa-location-dot text-emerald-400"></i> <span id="ativoFilialBadge">---</span>
+                </span>
+              </div>
+              <h2 class="text-xl font-extrabold text-slate-800">Pedido #<span id="ativoPedidoId">---</span></h2>
+              <p id="ativoClienteNome" class="text-sm font-semibold text-slate-600 mt-0.5">---</p>
+            </div>
+            <button onclick="mudarAbaFaturista('fila')" class="text-xs text-slate-500 hover:text-slate-800 underline">Voltar à fila</button>
+          </div>
+
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+            <p class="text-xs font-bold uppercase text-slate-500 mb-2">Itens do Pedido</p>
+            <div id="ativoItensResumo" class="text-sm font-bold text-slate-800 space-y-1"></div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-extrabold text-slate-700">
+              <i class="fa-solid fa-barcode mr-1 ifco-text"></i> Bipar ou Digitar Número da Nota Fiscal (NF-e) *
+            </label>
+            <input id="ativoInputNf" type="text" placeholder="Passe o leitor na NF ou digite o número..." class="w-full border-2 border-[#007A33] rounded-xl px-4 py-3.5 text-lg font-extrabold tracking-wide focus:outline-none bg-emerald-50/30" />
+          </div>
+
+          <button onclick="enviarParaExpedicao()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-4 px-6 rounded-xl text-base shadow-lg transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Finalizar NF e Enviar para Fila da Doca
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== MÓDULO OPERADOR LOGÍSTICO (FILTRADO POR FILIAL) ==================== -->
+    <section id="viewOperador" class="hidden max-w-2xl mx-auto space-y-4">
+
+      <!-- Banner de Identificação da Filial Logada -->
+      <div class="bg-[#16202A] text-white rounded-2xl px-4 py-3 flex items-center justify-between shadow-sm">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-[#2AD182] flex items-center justify-center">
+            <i class="fa-solid fa-warehouse"></i>
+          </div>
+          <div>
+            <p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Unidade Logada</p>
+            <p id="opFilialHeader" class="text-sm font-extrabold text-white">AMERICANA</p>
+          </div>
+        </div>
+        <button onclick="trocarFilialOperador()" class="text-xs bg-white/10 hover:bg-white/20 text-slate-200 px-3 py-1.5 rounded-lg font-bold transition">
+          <i class="fa-solid fa-right-from-bracket mr-1"></i> Trocar Filial
+        </button>
+      </div>
+
+      <!-- Tela Lista de Pedidos Aguardando na Doca da Filial -->
+      <div id="opListaContainer" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-800">Fila de Carregamento (Doca)</h2>
+            <p class="text-xs text-slate-500">Exibindo somente pedidos faturados desta filial</p>
+          </div>
+          <button onclick="carregarDados()" class="text-xs font-bold ifco-text bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200">
+            <i class="fa-solid fa-rotate mr-1"></i> Atualizar
+          </button>
+        </div>
+
+        <div id="opListaPedidos" class="space-y-3"></div>
+      </div>
+
+      <!-- Tela Romaneio Digital & Execução do Operador -->
+      <div id="opRomaneioContainer" class="hidden bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <span class="text-xs font-bold uppercase text-emerald-700">Romaneio Digital</span>
+            <h2 class="text-xl font-extrabold text-slate-800">Pedido #<span id="opRomPedido">---</span></h2>
+            <p class="text-xs text-slate-500">NF: <strong id="opRomNf">---</strong> • Cliente: <strong id="opRomCliente">---</strong></p>
+          </div>
+          <button onclick="fecharRomaneioOperador()" class="text-xs text-slate-500 underline">Voltar</button>
+        </div>
+
+        <div class="space-y-2">
+          <p class="text-xs font-bold uppercase text-slate-500">Toque nos itens conforme separar:</p>
+          <div id="opChecklistItens" class="space-y-2"></div>
+        </div>
+
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+          <label class="block text-xs font-extrabold text-slate-700 uppercase">
+            <i class="fa-solid fa-camera mr-1"></i> Comprovação (Foto da Carga / Canhoto)
+          </label>
+          <input id="opInputFoto" type="file" accept="image/*" capture="environment" onchange="processarFotoOperador(event)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-800 file:text-white" />
+          <p id="opFotoStatus" class="text-xs text-emerald-700 font-semibold hidden"><i class="fa-solid fa-check"></i> Foto registrada com sucesso!</p>
+        </div>
+
+        <div class="bg-emerald-50/60 p-5 rounded-xl border border-emerald-200 text-center space-y-3">
+          <p class="text-sm font-extrabold text-slate-800">Avaliação do Motorista (Atendimento Pátio)</p>
+          <p class="text-xs text-slate-500">Toque nas estrelas de 1 a 5 para avaliar</p>
+          
+          <div class="flex justify-center items-center gap-3 py-1" id="npsStarsContainer">
+            <button type="button" onclick="selecionarEstrelas(1)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="selecionarEstrelas(2)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="selecionarEstrelas(3)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="selecionarEstrelas(4)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="selecionarEstrelas(5)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none"><i class="fa-solid fa-star"></i></button>
+          </div>
+
+          <p id="npsLabelTexto" class="text-xs font-extrabold text-[#007A33] h-4"></p>
+        </div>
+
+        <button onclick="concluirCarregamentoOperador()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-4 rounded-xl text-base shadow-lg transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-flag-checkered"></i> Concluir Carregamento e Liberar Caminhão
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ==================== MÓDULO RELATÓRIO DE ATENDIMENTOS (ÁREA RESTRITA) ==================== -->
+    <section id="viewRelatorio" class="hidden space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg ifco-green text-white flex items-center justify-center text-sm shadow-xs">
+            <i class="fa-solid fa-table-cells"></i>
+          </div>
+          <h2 class="text-lg sm:text-xl font-extrabold text-slate-800">Relatório de Atendimentos (Google Sheets)</h2>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <a id="linkPlanilhaDireto" href="https://docs.google.com/spreadsheets" target="_blank" class="ifco-green hover:ifco-green-dark text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-xs transition inline-flex items-center gap-1.5">
+            <i class="fa-solid fa-file-excel"></i> Abrir Google Sheets
+          </a>
+          <button onclick="carregarDados()" class="bg-[#16202A] hover:bg-slate-800 text-white text-xs font-bold px-3.5 py-2.5 rounded-xl shadow-xs transition inline-flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate"></i> Atualizar
+          </button>
+          <button onclick="voltarMenu()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-3.5 py-2.5 rounded-xl transition inline-flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-left"></i> Voltar
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-3.5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-slate-50/70">
+          <span class="text-xs font-bold text-slate-500">
+            Total de registros exibidos: <strong id="relatorioCount" class="text-slate-800">0</strong>
+          </span>
+          <div class="relative w-full sm:w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input id="buscaRelatorio" onkeyup="renderizarRelatorio()" type="text" placeholder="Filtrar por pedido, filial, cliente ou NF..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-[#007A33]" />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 text-[11px] uppercase tracking-wider font-extrabold border-b border-slate-200 whitespace-nowrap">
+                <th class="py-3 px-3.5">Pedido / Cliente</th>
+                <th class="py-3 px-3.5">Filial</th>
+                <th class="py-3 px-3.5">Data Agenda</th>
+                <th class="py-3 px-3.5">NF</th>
+                <th class="py-3 px-3.5">Itens / Romaneio</th>
+                <th class="py-3 px-3.5">Status</th>
+                <th class="py-3 px-3.5">Chegada</th>
+                <th class="py-3 px-3.5">Fim Fat.</th>
+                <th class="py-3 px-3.5">Início Sep.</th>
+                <th class="py-3 px-3.5">Fim Carreg.</th>
+                <th class="py-3 px-3.5">Tempo Total</th>
+                <th class="py-3 px-3.5 text-center">Avaliação</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyRelatorio" class="divide-y divide-slate-200 text-xs"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL LOGIN DO OPERADOR POR FILIAL -->
+  <div id="modalLoginOperador" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-xs items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-lg bg-slate-800 text-white flex items-center justify-center">
+            <i class="fa-solid fa-warehouse"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-slate-800">Acesso Operador Doca</h3>
+            <p class="text-xs text-slate-500">Informe sua filial para filtrar a fila</p>
+          </div>
+        </div>
+        <button onclick="fecharModalLoginOperador()" class="text-slate-400 hover:text-slate-700 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Filial (Digitação Livre)</label>
+          <input id="inputLoginFilial" type="text" placeholder="Ex: AMERICANA" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold uppercase focus:outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Senha da Filial</label>
+          <input id="inputSenhaFilial" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter') validarLoginOperador()" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold tracking-widest focus:outline-none" />
+        </div>
+        <button onclick="validarLoginOperador()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-3 rounded-xl text-sm transition">
+          Entrar na Fila da Filial
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE SENHA DA ÁREA RESTRITA -->
+  <div id="modalRestrito" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-xs items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-lg bg-[#16202A] text-[#2AD182] flex items-center justify-center">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-slate-800">Área Restrita</h3>
+            <p class="text-xs text-slate-500">Relatório e Planilha Gerencial</p>
+          </div>
+        </div>
+        <button onclick="fecharModalRestrito()" class="text-slate-400 hover:text-slate-700 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <label class="block text-xs font-bold text-slate-600">Digite a senha de acesso:</label>
+        <input id="inputSenhaRestrita" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter') validarSenhaRestrita()" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-4 py-3 text-center text-lg font-extrabold tracking-widest focus:outline-none" />
+        <button onclick="validarSenhaRestrita()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-3 rounded-xl text-sm transition">
+          Acessar Relatório
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST DE NOTIFICAÇÃO -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-xl items-center gap-2">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+    <span id="toastMsg">Mensagem</span>
+  </div>
+
+  <script>
     // =========================================================================
     // CONFIGURAÇÃO E ESTADO GLOBAL (V3 MULTI-FILIAL BLINDADO MOBILE)
     // =========================================================================
@@ -70,7 +527,7 @@
           wakeLock = await navigator.wakeLock.request("screen");
           wakeLock.addEventListener("release", () => { wakeLock = null; });
         }
-      } catch (e) { /* Ignora se bateria fraca ou navegador sem suporte */ }
+      } catch (e) {}
     }
 
     function liberarTelaSempreLigada() {
@@ -92,7 +549,6 @@
       localStorage.setItem("ifco_v3_op_ativo", JSON.stringify(estado));
     }
 
-    // Reativa WakeLock quando o operador desbloqueia o celular sem resetar a tela
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible" && pedidoAtivoOperador) {
         ativarTelaSempreLigada();
@@ -298,7 +754,6 @@
     }
 
     function voltarMenu() {
-      // Se o operador tem um romaneio aberto em andamento, pede confirmação para não sair sem querer
       if (pedidoAtivoOperador) {
         const confirmar = confirm("Você tem um carregamento aberto em andamento. Deseja realmente voltar ao menu inicial?");
         if (!confirmar) return;
@@ -815,3 +1270,5 @@
       }, 3200);
     }
   </script>
+</body>
+</html>
