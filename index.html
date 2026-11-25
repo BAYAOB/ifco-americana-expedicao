@@ -43,30 +43,39 @@
   <main class="flex-1 max-w-6xl w-full mx-auto p-4">
 
     <!-- ==================== TELA 0: MENU DE PERFIL ==================== -->
-    <section id="viewMenu" class="max-w-xl mx-auto mt-6 space-y-4">
+    <section id="viewMenu" class="max-w-3xl mx-auto mt-6 space-y-4">
       <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 text-center">
         <h2 class="text-xl font-extrabold text-slate-800">Selecione o Posto de Trabalho</h2>
         <p class="text-sm text-slate-500 mt-1">Escolha a interface operacional para iniciar</p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-          <button onclick="abrirPerfil('faturista')" class="group p-6 rounded-xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-left flex flex-col justify-between">
-            <div class="w-12 h-12 rounded-xl ifco-green text-white flex items-center justify-center text-xl mb-4 group-hover:scale-105 transition">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+          <!-- Faturamento -->
+          <button onclick="abrirPerfil('faturista')" class="group p-6 rounded-2xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-center flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-xl ifco-green text-white flex items-center justify-center text-xl mb-3 group-hover:scale-105 transition">
               <i class="fa-solid fa-file-invoice-dollar"></i>
             </div>
-            <div>
-              <h3 class="font-bold text-lg text-slate-800">Faturamento</h3>
-              <p class="text-xs text-slate-500 mt-1">Agenda do dia, check-in de motoristas e registro de NF</p>
-            </div>
+            <h3 class="font-extrabold text-base text-slate-800">Faturamento</h3>
+            <p class="text-xs text-slate-500 mt-1">Agenda do dia, check-in e registro de NF</p>
           </button>
 
-          <button onclick="abrirPerfil('operador')" class="group p-6 rounded-xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-left flex flex-col justify-between">
-            <div class="w-12 h-12 rounded-xl bg-slate-800 text-white flex items-center justify-center text-xl mb-4 group-hover:scale-105 transition">
+          <!-- Operador Logístico -->
+          <button onclick="abrirPerfil('operador')" class="group p-6 rounded-2xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-center flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-slate-800 text-white flex items-center justify-center text-xl mb-3 group-hover:scale-105 transition">
               <i class="fa-solid fa-dolly"></i>
             </div>
-            <div>
-              <h3 class="font-bold text-lg text-slate-800">Operador Logístico</h3>
-              <p class="text-xs text-slate-500 mt-1">Fila de doca, romaneio digital, foto e avaliação</p>
+            <h3 class="font-extrabold text-base text-slate-800">Operador Logístico</h3>
+            <p class="text-xs text-slate-500 mt-1">Fila de doca, romaneio, foto e avaliação</p>
+          </button>
+
+          <!-- Planilha / Relatório (Área Restrita) -->
+          <button onclick="abrirModalRestrito()" class="group p-6 rounded-2xl bg-[#16202A] hover:bg-[#1e2b38] border-2 border-[#16202A] hover:border-emerald-500 transition text-center flex flex-col items-center justify-center shadow-sm">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/15 text-[#2AD182] flex items-center justify-center text-2xl mb-3 group-hover:scale-105 transition">
+              <i class="fa-solid fa-table-cells-large"></i>
             </div>
+            <h3 class="font-extrabold text-base text-white">Planilha / Relatório</h3>
+            <span class="mt-2 inline-block bg-[#007A33] text-white text-[11px] font-bold px-3 py-1 rounded-full">
+              Área Restrita
+            </span>
           </button>
         </div>
       </div>
@@ -174,29 +183,21 @@
               </div>
             </div>
 
-            <!-- Adição de Modelos e Quantidades -->
+            <!-- Adição de Modelos e Quantidades (DIGITAÇÃO LIVRE) -->
             <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
               <label class="block text-xs font-bold text-slate-700">Modelos e Quantidades de Caixas *</label>
               <div class="flex flex-col sm:flex-row gap-2">
-                <select id="cadModeloSelect" class="flex-1 border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:border-[#007A33]">
-                  <option value="">Selecione o modelo IFCO...</option>
-                  <option value="6410">6410 (Verde Baixa)</option>
-                  <option value="6413">6413 (Verde Média)</option>
-                  <option value="6416">6416 (Verde Alta)</option>
-                  <option value="6419">6419 (Verde Extra Alta)</option>
-                  <option value="6422">6422 (Verde Grande)</option>
-                  <option value="4310">4310 (Pequena)</option>
-                  <option value="4314">4314 (Média)</option>
-                  <option value="6411">6411 (Preta/Especial)</option>
-                </select>
-                <input id="cadQtdInput" type="number" min="1" placeholder="Qtd (ex: 500)" class="w-full sm:w-36 border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:border-[#007A33]" />
+                <input id="cadModeloInput" type="text" placeholder="Modelo (ex: 6413)" onkeydown="if(event.key==='Enter') adicionarItemCadastro()" class="flex-1 border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-sm font-bold uppercase focus:outline-none focus:border-[#007A33]" />
+                <input id="cadQtdInput" type="number" min="1" placeholder="Qtd (ex: 500)" onkeydown="if(event.key==='Enter') adicionarItemCadastro()" class="w-full sm:w-36 border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:border-[#007A33]" />
                 <button onclick="adicionarItemCadastro()" type="button" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition">
                   <i class="fa-solid fa-plus mr-1"></i> Adicionar
                 </button>
               </div>
 
               <!-- Lista de itens adicionados -->
-              <div id="listaItensCadastro" class="space-y-1.5"></div>
+              <div id="listaItensCadastro" class="space-y-1.5">
+                <p class="text-xs text-slate-400 italic">Nenhum item adicionado ainda.</p>
+              </div>
             </div>
 
             <button onclick="salvarAgendamento()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-3.5 px-6 rounded-xl text-base shadow-md transition flex items-center justify-center gap-2">
@@ -206,7 +207,7 @@
         </div>
       </div>
 
-      <!-- SUB-TELA FATURISTA 3: TELA DE NF (ATENDIMENTO ATIVO - MANTIDA INTACTA) -->
+      <!-- SUB-TELA FATURISTA 3: TELA DE NF (ATENDIMENTO ATIVO) -->
       <div id="fatSubAtivo" class="hidden max-w-2xl mx-auto">
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-5">
           <div class="flex items-start justify-between border-b border-slate-100 pb-4">
@@ -242,7 +243,7 @@
 
     </section>
 
-    <!-- ==================== MÓDULO OPERADOR LOGÍSTICO (INTACTO + ESTRELAS) ==================== -->
+    <!-- ==================== MÓDULO OPERADOR LOGÍSTICO ==================== -->
     <section id="viewOperador" class="hidden max-w-2xl mx-auto space-y-4">
 
       <!-- Tela Lista de Pedidos Aguardando na Doca -->
@@ -323,6 +324,50 @@
 
   </main>
 
+  <!-- MODAL ÁREA RESTRITA (PLANILHA / RELATÓRIO) -->
+  <div id="modalRestrito" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-xs items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-lg bg-[#16202A] text-[#2AD182] flex items-center justify-center">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-slate-800">Acesso à Gestão / Relatórios</h3>
+            <p class="text-xs text-slate-500">Área restrita à supervisão e faturamento</p>
+          </div>
+        </div>
+        <button onclick="fecharModalRestrito()" class="text-slate-400 hover:text-slate-700 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Tela de Senha -->
+      <div id="restritoSenhaBox" class="space-y-3">
+        <label class="block text-xs font-bold text-slate-600">Digite a senha de acesso:</label>
+        <input id="inputSenhaRestrita" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter') validarSenhaRestrita()" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-4 py-3 text-center text-lg font-extrabold tracking-widest focus:outline-none" />
+        <button onclick="validarSenhaRestrita()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-3 rounded-xl text-sm transition">
+          Desbloquear Painel
+        </button>
+      </div>
+
+      <!-- Conteúdo Liberado -->
+      <div id="restritoConteudoBox" class="hidden space-y-3">
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-center space-y-2">
+          <p class="text-xs font-bold text-emerald-800">Acesso autorizado! Escolha onde deseja abrir:</p>
+          <a id="linkPlanilhaDireto" href="https://docs.google.com/spreadsheets" target="_blank" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 shadow-sm transition">
+            <i class="fa-solid fa-file-excel"></i> Abrir Planilha Google Sheets
+          </a>
+        </div>
+
+        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 text-xs text-slate-600 flex justify-between">
+          <span>Total de registros na base:</span>
+          <strong id="restritoTotalRegistros" class="text-slate-800">0</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST DE NOTIFICAÇÃO -->
   <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-xl items-center gap-2">
     <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
@@ -334,6 +379,8 @@
     // CONFIGURAÇÃO E ESTADO GLOBAL (V2 ISOLADA)
     // =========================================================================
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaSH6HpGUX27waLqdqUN8V4DAKvR4kSqLhkDlBTcdgycF7Bz0WZIvAWgpuZEA2Dq8o/exec";
+    const PLANILHA_URL = "https://docs.google.com/spreadsheets"; // Cole aqui o link exato da sua planilha V2 se quiser abrir direto nela
+    const SENHA_GESTAO = "ifco2026";
 
     let todosPedidos = [];
     let itensCadastroTemp = [];
@@ -345,6 +392,8 @@
 
     // Inicialização
     window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("linkPlanilhaDireto").href = PLANILHA_URL;
+
       // Preenche data/hora sugerida no cadastro manual
       const agora = new Date();
       const dia = String(agora.getDate()).padStart(2, '0');
@@ -367,9 +416,39 @@
     });
 
     // =========================================================================
+    // ÁREA RESTRITA (PLANILHA / RELATÓRIO)
+    // =========================================================================
+    function abrirModalRestrito() {
+      document.getElementById("inputSenhaRestrita").value = "";
+      document.getElementById("restritoSenhaBox").classList.remove("hidden");
+      document.getElementById("restritoConteudoBox").classList.add("hidden");
+      const modal = document.getElementById("modalRestrito");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      setTimeout(() => document.getElementById("inputSenhaRestrita").focus(), 100);
+    }
+
+    function fecharModalRestrito() {
+      const modal = document.getElementById("modalRestrito");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    async function validarSenhaRestrita() {
+      const digitada = document.getElementById("inputSenhaRestrita").value.trim();
+      if (digitada !== SENHA_GESTAO) {
+        return mostrarToast("Senha incorreta!", true);
+      }
+      document.getElementById("restritoSenhaBox").classList.add("hidden");
+      document.getElementById("restritoConteudoBox").classList.remove("hidden");
+      if (todosPedidos.length === 0) await carregarDados();
+      document.getElementById("restritoTotalRegistros").textContent = todosPedidos.length;
+    }
+
+    // =========================================================================
     // NAVEGAÇÃO ENTRE PERFIS
     // =========================================================================
-    function abrirPerfil(perfil, skipFetch = false) {
+    function abrirPerfil(perfil) {
       localStorage.setItem("ifco_v2_perfil_atual", perfil);
       document.getElementById("viewMenu").classList.add("hidden");
       document.getElementById("btnMenuTop").classList.remove("hidden");
@@ -513,16 +592,17 @@
       }).join("");
     }
 
-    // Cadastro de Itens na Tela de Agendamento
+    // Cadastro de Itens na Tela de Agendamento (Digitação Livre)
     function adicionarItemCadastro() {
-      const modelo = document.getElementById("cadModeloSelect").value;
+      const modelo = document.getElementById("cadModeloInput").value.trim().toUpperCase();
       const qtd = document.getElementById("cadQtdInput").value;
       if (!modelo || !qtd || Number(qtd) <= 0) {
-        return mostrarToast("Selecione o modelo e informe a quantidade", true);
+        return mostrarToast("Digite o modelo e informe a quantidade", true);
       }
       itensCadastroTemp.push({ modelo, qtd: Number(qtd) });
-      document.getElementById("cadModeloSelect").value = "";
+      document.getElementById("cadModeloInput").value = "";
       document.getElementById("cadQtdInput").value = "";
+      document.getElementById("cadModeloInput").focus();
       renderizarItensCadastro();
     }
 
@@ -699,7 +779,7 @@
     }
 
     // =========================================================================
-    // LÓGICA DO OPERADOR LOGÍSTICO (MANTIDA INTACTA + AVALIAÇÃO POR ESTRELAS)
+    // LÓGICA DO OPERADOR LOGÍSTICO (INTACTA + AVALIAÇÃO POR ESTRELAS)
     // =========================================================================
     function renderizarFilaOperador() {
       const container = document.getElementById("opListaPedidos");
