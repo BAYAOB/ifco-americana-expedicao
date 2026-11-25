@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>IFCO Smart Expedição - Americana</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #f3f6f4; -webkit-tap-highlight-color: transparent; }
+    .ifco-green { background-color: #007A33; }
+    .ifco-green-dark { background-color: #005A25; }
+    .ifco-text { color: #007A33; }
+    .ifco-border { border-color: #007A33; }
+  </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+  <!-- HEADER GLOBAL -->
+  <header class="ifco-green text-white shadow-md sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="voltarMenu()">
+        <div class="bg-white text-[#007A33] font-black px-2.5 py-1 rounded text-lg tracking-tighter">IFCO</div>
+        <div>
+          <h1 class="font-bold text-sm sm:text-base leading-tight">Expedição Inteligente</h1>
+          <p class="text-[11px] text-emerald-100">Filial Americana • Controle de Pátio</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span id="syncIndicator" class="hidden text-xs bg-emerald-800 px-2.5 py-1 rounded-full items-center gap-1.5">
+          <i class="fa-solid fa-rotate fa-spin"></i> Sincronizando
+        </span>
+        <button id="btnMenuTop" onclick="voltarMenu()" class="hidden text-xs bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-lg font-semibold transition">
+          <i class="fa-solid fa-house mr-1"></i> Início
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4">
+
+    <!-- ==================== TELA 0: MENU DE PERFIL ==================== -->
+    <section id="viewMenu" class="max-w-xl mx-auto mt-6 space-y-4">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 text-center">
+        <h2 class="text-xl font-extrabold text-slate-800">Selecione o Posto de Trabalho</h2>
+        <p class="text-sm text-slate-500 mt-1">Escolha a interface operacional para iniciar</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+          <button onclick="abrirPerfil('faturista')" class="group p-6 rounded-xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-left flex flex-col justify-between">
+            <div class="w-12 h-12 rounded-xl ifco-green text-white flex items-center justify-center text-xl mb-4 group-hover:scale-105 transition">
+              <i class="fa-solid fa-file-invoice-dollar"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-slate-800">Faturamento</h3>
+              <p class="text-xs text-slate-500 mt-1">Agenda do dia, check-in de motoristas e registro de NF</p>
+            </div>
+          </button>
+
+          <button onclick="abrirPerfil('operador')" class="group p-6 rounded-xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-left flex flex-col justify-between">
+            <div class="w-12 h-12 rounded-xl bg-slate-800 text-white flex items-center justify-center text-xl mb-4 group-hover:scale-105 transition">
+              <i class="fa-solid fa-dolly"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg text-slate-800">Operador Logístico</h3>
+              <p class="text-xs text-slate-500 mt-1">Fila de doca, romaneio digital, foto e avaliação</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Configuração rápida da URL do Apps Script -->
+      <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+        <details>
+          <summary class="text-xs font-semibold text-slate-500 cursor-pointer flex items-center justify-between">
+            <span><i class="fa-solid fa-gear mr-1.5"></i> Configuração de Conexão (Google Sheets)</span>
+            <span id="statusConexaoBadge" class="text-emerald-700 font-bold">Configurado</span>
+          </summary>
+          <div class="mt-3 space-y-2">
+            <label class="block text-xs text-slate-600">URL do Web App (Google Apps Script):</label>
+            <div class="flex gap-2">
+              <input id="inputScriptUrl" type="text" class="flex-1 text-xs border border-slate-300 rounded-lg px-3 py-2" placeholder="https://script.google.com/macros/s/..." />
+              <button onclick="salvarScriptUrl()" class="ifco-green text-white text-xs font-bold px-3 py-2 rounded-lg">Salvar</button>
+            </div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO FATURISTA ==================== -->
+    <section id="viewFaturista" class="hidden space-y-4">
+
+      <!-- Barra de Navegação Interna do Faturista -->
+      <div class="bg-white rounded-xl p-2 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex gap-2">
+          <button id="tabFatFila" onclick="mudarAbaFaturista('fila')" class="px-4 py-2 rounded-lg text-sm font-bold ifco-green text-white transition flex items-center gap-2">
+            <i class="fa-solid fa-calendar-check"></i> Fila Agendada
+            <span id="badgeCountAgendados" class="bg-white text-[#007A33] text-xs px-2 py-0.5 rounded-full font-extrabold">0</span>
+          </button>
+          <button id="tabFatCadastrar" onclick="mudarAbaFaturista('cadastrar')" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
+            <i class="fa-solid fa-plus-circle"></i> Cadastrar Agendamento
+          </button>
+          <button id="tabFatAtivo" onclick="mudarAbaFaturista('ativo')" class="hidden px-4 py-2 rounded-lg text-sm font-bold bg-amber-500 text-white transition flex items-center gap-2">
+            <i class="fa-solid fa-bolt"></i> Atendimento Ativo
+          </button>
+        </div>
+
+        <button onclick="carregarDados()" class="text-xs font-semibold text-slate-600 hover:text-[#007A33] px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
+          <i class="fa-solid fa-arrows-rotate mr-1"></i> Atualizar Lista
+        </button>
+      </div>
+
+      <!-- SUB-TELA FATURISTA 1: FILA DE PEDIDOS AGENDADOS -->
+      <div id="fatSubFila" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="font-extrabold text-base text-slate-800">Pedidos Agendados para Atendimento</h2>
+            <p class="text-xs text-slate-500">Clique em <strong>Iniciar Atendimento</strong> assim que o motorista se apresentar</p>
+          </div>
+          <div class="relative w-full sm:w-64">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input id="buscaAgendados" onkeyup="renderizarTabelaAgendados()" type="text" placeholder="Buscar pedido ou cliente..." class="w-full pl-8 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:border-[#007A33]" />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3 px-4 font-bold">Pedido (ID)</th>
+                <th class="py-3 px-4 font-bold">Data / Hora</th>
+                <th class="py-3 px-4 font-bold">Cliente / Solicitante</th>
+                <th class="py-3 px-4 font-bold">Modelo & Quantidade</th>
+                <th class="py-3 px-4 font-bold text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyAgendados" class="divide-y divide-slate-200 text-sm">
+              <!-- Preenchido via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUB-TELA FATURISTA 2: CADASTRAR AGENDAMENTO / PEDIDO -->
+      <div id="fatSubCadastrar" class="hidden max-w-3xl mx-auto space-y-4">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-5">
+          <div class="border-b border-slate-100 pb-3">
+            <span class="text-xs font-extrabold uppercase tracking-wider ifco-text">Pré-Cadastro de Expedição</span>
+            <h2 class="text-lg font-extrabold text-slate-800">Registrar Pedido Agendado</h2>
+          </div>
+
+          <!-- OPÇÃO A: LER QR CODE -->
+          <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-4 space-y-3">
+            <p class="text-xs font-extrabold uppercase tracking-wide text-[#007A33]">
+              <i class="fa-solid fa-qrcode mr-1"></i> Opção A: Ler QR Code do Pedido (App IFCO / Motorista)
+            </p>
+            <button id="btnAbrirQrAgenda" onclick="toggleQrAgenda()" class="w-full ifco-green hover:ifco-green-dark text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
+              <i class="fa-solid fa-camera"></i> <span id="txtBtnQrAgenda">Abrir Leitor de QR Code</span>
+            </button>
+            <div id="qrReaderAgendaContainer" class="hidden rounded-xl overflow-hidden border-2 border-[#007A33] bg-black">
+              <div id="qrReaderAgenda" class="w-full"></div>
+            </div>
+          </div>
+
+          <div class="relative flex py-1 items-center">
+            <div class="flex-grow border-t border-slate-200"></div>
+            <span class="flex-shrink mx-3 text-[11px] font-bold uppercase text-slate-400">Ou digitação manual</span>
+            <div class="flex-grow border-t border-slate-200"></div>
+          </div>
+
+          <!-- OPÇÃO B: DIGITAÇÃO MANUAL -->
+          <div class="space-y-4">
+            <p class="text-xs font-extrabold uppercase tracking-wide text-slate-700">
+              <i class="fa-solid fa-keyboard mr-1"></i> Opção B: Dados do Agendamento
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Nº do Pedido *</label>
+                <input id="cadPedidoId" type="text" placeholder="Ex: 6917" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Data / Hora Agendada</label>
+                <input id="cadDataHora" type="text" placeholder="Ex: 25/11 08:30" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm focus:outline-none" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-600 mb-1">Cliente / Solicitante *</label>
+                <input id="cadCliente" type="text" placeholder="Ex: CITRICA BARDIN" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm focus:outline-none" />
+              </div>
+            </div>
+
+            <!-- Adição de Modelos e Quantidades -->
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+              <label class="block text-xs font-bold text-slate-700">Modelos e Quantidades de Caixas *</label>
+              <div class="flex flex-col sm:flex-row gap-2">
+                <select id="cadModeloSelect" class="flex-1 border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-sm font-medium focus:outline-none focus:border-[#007A33]">
+                  <option value="">Selecione o modelo IFCO...</option>
+                  <option value="6410">6410 (Verde Baixa)</option>
+                  <option value="6413">6413 (Verde Média)</option>
+                  <option value="6416">6416 (Verde Alta)</option>
+                  <option value="6419">6419 (Verde Extra Alta)</option>
+                  <option value="6422">6422 (Verde Grande)</option>
+                  <option value="4310">4310 (Pequena)</option>
+                  <option value="4314">4314 (Média)</option>
+                  <option value="6411">6411 (Preta/Especial)</option>
+                </select>
+                <input id="cadQtdInput" type="number" min="1" placeholder="Qtd (ex: 500)" class="w-full sm:w-36 border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:border-[#007A33]" />
+                <button onclick="adicionarItemCadastro()" type="button" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition">
+                  <i class="fa-solid fa-plus mr-1"></i> Adicionar
+                </button>
+              </div>
+
+              <!-- Lista de itens adicionados -->
+              <div id="listaItensCadastro" class="space-y-1.5"></div>
+            </div>
+
+            <button onclick="salvarAgendamento()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-3.5 px-6 rounded-xl text-base shadow-md transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-check-circle"></i> Registrar Agendamento
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-TELA FATURISTA 3: TELA DE NF (ATENDIMENTO ATIVO - MANTIDA INTACTA) -->
+      <div id="fatSubAtivo" class="hidden max-w-2xl mx-auto">
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-5">
+          <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+            <div>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 mb-2">
+                <i class="fa-solid fa-clock"></i> Atendimento em Andamento • Chegada: <span id="ativoHoraInicio">--:--</span>
+              </span>
+              <h2 class="text-xl font-extrabold text-slate-800">Pedido #<span id="ativoPedidoId">---</span></h2>
+              <p id="ativoClienteNome" class="text-sm font-semibold text-slate-600 mt-0.5">---</p>
+            </div>
+            <button onclick="mudarAbaFaturista('fila')" class="text-xs text-slate-500 hover:text-slate-800 underline">Voltar à fila</button>
+          </div>
+
+          <!-- Resumo dos Itens do Pedido -->
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
+            <p class="text-xs font-bold uppercase text-slate-500 mb-2">Itens do Pedido</p>
+            <div id="ativoItensResumo" class="text-sm font-bold text-slate-800 space-y-1"></div>
+          </div>
+
+          <!-- Campo de Bipagem da NF -->
+          <div class="space-y-2">
+            <label class="block text-sm font-extrabold text-slate-700">
+              <i class="fa-solid fa-barcode mr-1 ifco-text"></i> Bipar ou Digitar Número da Nota Fiscal (NF-e) *
+            </label>
+            <input id="ativoInputNf" type="text" placeholder="Passe o leitor na NF ou digite o número..." class="w-full border-2 border-[#007A33] rounded-xl px-4 py-3.5 text-lg font-extrabold tracking-wide focus:outline-none bg-emerald-50/30" />
+          </div>
+
+          <button onclick="enviarParaExpedicao()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-4 px-6 rounded-xl text-base shadow-lg transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Finalizar NF e Enviar para Fila da Doca
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== MÓDULO OPERADOR LOGÍSTICO (INTACTO + ESTRELAS) ==================== -->
+    <section id="viewOperador" class="hidden max-w-2xl mx-auto space-y-4">
+
+      <!-- Tela Lista de Pedidos Aguardando na Doca -->
+      <div id="opListaContainer" class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-800">Fila de Carregamento (Doca)</h2>
+            <p class="text-xs text-slate-500">Pedidos faturados aguardando separação</p>
+          </div>
+          <button onclick="carregarDados()" class="text-xs font-bold ifco-text bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200">
+            <i class="fa-solid fa-rotate mr-1"></i> Atualizar
+          </button>
+        </div>
+
+        <div id="opListaPedidos" class="space-y-3">
+          <!-- Cards da fila do operador -->
+        </div>
+      </div>
+
+      <!-- Tela Romaneio Digital & Execução do Operador -->
+      <div id="opRomaneioContainer" class="hidden bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <span class="text-xs font-bold uppercase text-emerald-700">Romaneio Digital</span>
+            <h2 class="text-xl font-extrabold text-slate-800">Pedido #<span id="opRomPedido">---</span></h2>
+            <p class="text-xs text-slate-500">NF: <strong id="opRomNf">---</strong> • Cliente: <strong id="opRomCliente">---</strong></p>
+          </div>
+          <button onclick="fecharRomaneioOperador()" class="text-xs text-slate-500 underline">Voltar</button>
+        </div>
+
+        <!-- Checklist de Separação -->
+        <div class="space-y-2">
+          <p class="text-xs font-bold uppercase text-slate-500">Toque nos itens conforme separar:</p>
+          <div id="opChecklistItens" class="space-y-2"></div>
+        </div>
+
+        <!-- Comprovação Fotográfica -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
+          <label class="block text-xs font-extrabold text-slate-700 uppercase">
+            <i class="fa-solid fa-camera mr-1"></i> Comprovação (Foto da Carga / Canhoto)
+          </label>
+          <input id="opInputFoto" type="file" accept="image/*" capture="environment" onchange="processarFotoOperador(event)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-800 file:text-white" />
+          <p id="opFotoStatus" class="text-xs text-emerald-700 font-semibold hidden"><i class="fa-solid fa-check"></i> Foto registrada com sucesso!</p>
+        </div>
+
+        <!-- Avaliação NPS do Motorista (1 a 5 Estrelas) -->
+        <div class="bg-emerald-50/60 p-5 rounded-xl border border-emerald-200 text-center space-y-3">
+          <p class="text-sm font-extrabold text-slate-800">Avaliação do Motorista (Atendimento Pátio)</p>
+          <p class="text-xs text-slate-500">Toque nas estrelas de 1 a 5 para avaliar</p>
+          
+          <div class="flex justify-center items-center gap-3 py-1" id="npsStarsContainer">
+            <button type="button" onclick="selecionarEstrelas(1)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none">
+              <i class="fa-solid fa-star"></i>
+            </button>
+            <button type="button" onclick="selecionarEstrelas(2)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none">
+              <i class="fa-solid fa-star"></i>
+            </button>
+            <button type="button" onclick="selecionarEstrelas(3)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none">
+              <i class="fa-solid fa-star"></i>
+            </button>
+            <button type="button" onclick="selecionarEstrelas(4)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none">
+              <i class="fa-solid fa-star"></i>
+            </button>
+            <button type="button" onclick="selecionarEstrelas(5)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none">
+              <i class="fa-solid fa-star"></i>
+            </button>
+          </div>
+
+          <p id="npsLabelTexto" class="text-xs font-extrabold text-[#007A33] h-4"></p>
+        </div>
+
+        <button onclick="concluirCarregamentoOperador()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-4 rounded-xl text-base shadow-lg transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-flag-checkered"></i> Concluir Carregamento e Liberar Caminhão
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- TOAST DE NOTIFICAÇÃO -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-xl items-center gap-2">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+    <span id="toastMsg">Mensagem</span>
+  </div>
+
+  <script>
+    // =========================================================================
+    // CONFIGURAÇÃO E ESTADO GLOBAL
+    // =========================================================================
+    const DEFAULT_SCRIPT_URL = "COLE_AQUI_A_URL_DO_SEU_GOOGLE_APPS_SCRIPT";
+    let SCRIPT_URL = localStorage.getItem("ifco_script_url") || DEFAULT_SCRIPT_URL;
+
+    let todosPedidos = [];
+    let itensCadastroTemp = [];
+    let pedidoAtivoFaturista = null;
+    let pedidoAtivoOperador = null;
+    let npsSelecionado = "";
+    let fotoBase64Resumo = "";
+    let qrScannerAgenda = null;
+
+    // Inicialização
+    window.addEventListener("DOMContentLoaded", () => {
+      if (SCRIPT_URL && SCRIPT_URL !== DEFAULT_SCRIPT_URL) {
+        document.getElementById("inputScriptUrl").value = SCRIPT_URL;
+      }
+
+      // Preenche data/hora sugerida no cadastro manual
+      const agora = new Date();
+      const dia = String(agora.getDate()).padStart(2, '0');
+      const mes = String(agora.getMonth() + 1).padStart(2, '0');
+      const hora = String(agora.getHours()).padStart(2, '0');
+      const min = String(agora.getMinutes()).padStart(2, '0');
+      document.getElementById("cadDataHora").value = `${dia}/${mes} ${hora}:${min}`;
+
+      // Recupera sessão do operador se a tela do celular bloqueou
+      const savedOp = localStorage.getItem("ifco_op_ativo");
+      const savedPerfil = localStorage.getItem("ifco_perfil_atual");
+
+      if (savedPerfil) {
+        abrirPerfil(savedPerfil, true);
+        if (savedPerfil === "operador" && savedOp) {
+          pedidoAtivoOperador = JSON.parse(savedOp);
+          abrirRomaneioOperador(pedidoAtivoOperador, true);
+        }
+      }
+    });
+
+    function salvarScriptUrl() {
+      const val = document.getElementById("inputScriptUrl").value.trim();
+      if (!val) return mostrarToast("Insira uma URL válida", true);
+      SCRIPT_URL = val;
+      localStorage.setItem("ifco_script_url", val);
+      mostrarToast("URL salva com sucesso!");
+      carregarDados();
+    }
+
+    // =========================================================================
+    // NAVEGAÇÃO ENTRE PERFIS
+    // =========================================================================
+    function abrirPerfil(perfil, skipFetch = false) {
+      localStorage.setItem("ifco_perfil_atual", perfil);
+      document.getElementById("viewMenu").classList.add("hidden");
+      document.getElementById("btnMenuTop").classList.remove("hidden");
+
+      if (perfil === "faturista") {
+        document.getElementById("viewFaturista").classList.remove("hidden");
+        document.getElementById("viewOperador").classList.add("hidden");
+        mudarAbaFaturista("fila");
+      } else {
+        document.getElementById("viewOperador").classList.remove("hidden");
+        document.getElementById("viewFaturista").classList.add("hidden");
+      }
+
+      if (!skipFetch) carregarDados();
+      else carregarDados();
+    }
+
+    function voltarMenu() {
+      pararQrAgenda();
+      localStorage.removeItem("ifco_perfil_atual");
+      document.getElementById("viewMenu").classList.remove("hidden");
+      document.getElementById("viewFaturista").classList.add("hidden");
+      document.getElementById("viewOperador").classList.add("hidden");
+      document.getElementById("btnMenuTop").classList.add("hidden");
+    }
+
+    // =========================================================================
+    // COMUNICAÇÃO COM GOOGLE SHEETS
+    // =========================================================================
+    async function carregarDados() {
+      if (!SCRIPT_URL || SCRIPT_URL === DEFAULT_SCRIPT_URL) {
+        renderizarTabelaAgendados();
+        renderizarFilaOperador();
+        return;
+      }
+
+      toggleSync(true);
+      try {
+        const res = await fetch(SCRIPT_URL);
+        const data = await res.json();
+        todosPedidos = Array.isArray(data) ? data : [];
+        renderizarTabelaAgendados();
+        renderizarFilaOperador();
+      } catch (err) {
+        console.error(err);
+        mostrarToast("Erro ao buscar dados da planilha", true);
+      } finally {
+        toggleSync(false);
+      }
+    }
+
+    async function enviarPost(payload) {
+      if (!SCRIPT_URL || SCRIPT_URL === DEFAULT_SCRIPT_URL) {
+        mostrarToast("Configure a URL do Google Apps Script no Início!", true);
+        return false;
+      }
+      toggleSync(true);
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        return true;
+      } catch (err) {
+        console.error(err);
+        mostrarToast("Falha de conexão ao salvar", true);
+        return false;
+      } finally {
+        toggleSync(false);
+      }
+    }
+
+    // =========================================================================
+    // LÓGICA DO FATURISTA (AGENDA + CADASTRO + TELA NF)
+    // =========================================================================
+    function mudarAbaFaturista(aba) {
+      pararQrAgenda();
+
+      document.getElementById("fatSubFila").classList.add("hidden");
+      document.getElementById("fatSubCadastrar").classList.add("hidden");
+      document.getElementById("fatSubAtivo").classList.add("hidden");
+
+      const btnFila = document.getElementById("tabFatFila");
+      const btnCad = document.getElementById("tabFatCadastrar");
+
+      btnFila.className = "px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition flex items-center gap-2";
+      btnCad.className = "px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition flex items-center gap-2";
+
+      if (aba === "fila") {
+        document.getElementById("fatSubFila").classList.remove("hidden");
+        btnFila.className = "px-4 py-2 rounded-lg text-sm font-bold ifco-green text-white transition flex items-center gap-2";
+      } else if (aba === "cadastrar") {
+        document.getElementById("fatSubCadastrar").classList.remove("hidden");
+        btnCad.className = "px-4 py-2 rounded-lg text-sm font-bold ifco-green text-white transition flex items-center gap-2";
+      } else if (aba === "ativo") {
+        document.getElementById("fatSubAtivo").classList.remove("hidden");
+        document.getElementById("tabFatAtivo").classList.remove("hidden");
+      }
+    }
+
+    function renderizarTabelaAgendados() {
+      const tbody = document.getElementById("tbodyAgendados");
+      const termo = (document.getElementById("buscaAgendados").value || "").toLowerCase();
+
+      const agendados = todosPedidos.filter(p => {
+        const st = (p.status || "").toLowerCase();
+        const matchStatus = st === "agendado" || st === "em faturamento";
+        const matchBusca = !termo ||
+          String(p.pedido).toLowerCase().includes(termo) ||
+          String(p.cliente).toLowerCase().includes(termo) ||
+          String(p.itens).toLowerCase().includes(termo);
+        return matchStatus && matchBusca;
+      });
+
+      document.getElementById("badgeCountAgendados").textContent = agendados.length;
+
+      if (agendados.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-10 text-center text-slate-400 text-sm">
+              <i class="fa-regular fa-calendar-xmark text-2xl mb-2 block"></i>
+              Nenhum pedido agendado aguardando no momento.<br/>
+              <button onclick="mudarAbaFaturista('cadastrar')" class="mt-2 text-xs font-bold ifco-text underline">+ Cadastrar novo agendamento</button>
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = agendados.map(p => {
+        const emAtendimento = (p.status || "").toLowerCase() === "em faturamento";
+        return `
+          <tr class="hover:bg-slate-50 transition">
+            <td class="py-3.5 px-4 font-extrabold text-slate-800">#${p.pedido}</td>
+            <td class="py-3.5 px-4 text-xs font-semibold text-slate-600">${p.agendamento || "Hoje"}</td>
+            <td class="py-3.5 px-4 font-bold text-slate-800">${p.cliente || "Cliente não informado"}</td>
+            <td class="py-3.5 px-4">
+              <span class="inline-block bg-emerald-50 text-[#007A33] border border-emerald-200 text-xs font-extrabold px-2.5 py-1 rounded-lg">
+                ${p.itens || "-"}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-right">
+              <button onclick='iniciarAtendimento(${JSON.stringify(p).replace(/'/g, "&apos;")})'
+                class="${emAtendimento ? 'bg-amber-500 hover:bg-amber-600' : 'ifco-green hover:ifco-green-dark'} text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-sm transition inline-flex items-center gap-1.5">
+                <i class="fa-solid ${emAtendimento ? 'fa-arrow-right' : 'fa-play'}"></i>
+                ${emAtendimento ? 'Continuar NF' : 'Iniciar Atendimento'}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // Cadastro de Itens na Tela de Agendamento
+    function adicionarItemCadastro() {
+      const modelo = document.getElementById("cadModeloSelect").value;
+      const qtd = document.getElementById("cadQtdInput").value;
+      if (!modelo || !qtd || Number(qtd) <= 0) {
+        return mostrarToast("Selecione o modelo e informe a quantidade", true);
+      }
+      itensCadastroTemp.push({ modelo, qtd: Number(qtd) });
+      document.getElementById("cadModeloSelect").value = "";
+      document.getElementById("cadQtdInput").value = "";
+      renderizarItensCadastro();
+    }
+
+    function removerItemCadastro(idx) {
+      itensCadastroTemp.splice(idx, 1);
+      renderizarItensCadastro();
+    }
+
+    function renderizarItensCadastro() {
+      const container = document.getElementById("listaItensCadastro");
+      if (itensCadastroTemp.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 italic">Nenhum item adicionado ainda.</p>`;
+        return;
+      }
+      container.innerHTML = itensCadastroTemp.map((item, idx) => `
+        <div class="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-slate-200 text-xs font-bold">
+          <span>Modelo <span class="ifco-text">${item.modelo}</span> — ${item.qtd} caixas</span>
+          <button onclick="removerItemCadastro(${idx})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `).join("");
+    }
+
+    async function salvarAgendamento() {
+      const pedido = document.getElementById("cadPedidoId").value.trim();
+      const agendamento = document.getElementById("cadDataHora").value.trim();
+      const cliente = document.getElementById("cadCliente").value.trim();
+
+      if (!pedido || !cliente) {
+        return mostrarToast("Preencha o Nº do Pedido e o Cliente", true);
+      }
+      if (itensCadastroTemp.length === 0) {
+        return mostrarToast("Adicione pelo menos um modelo e quantidade", true);
+      }
+
+      const itensFormatado = itensCadastroTemp.map(i => `${i.modelo} (${i.qtd})`).join(" | ");
+
+      const ok = await enviarPost({
+        action: "agendar",
+        pedido,
+        agendamento,
+        cliente,
+        itens: itensFormatado
+      });
+
+      if (ok) {
+        // Atualiza localmente na hora para fluidez imediata
+        todosPedidos.unshift({
+          pedido,
+          status: "Agendado",
+          agendamento,
+          cliente,
+          itens: itensFormatado
+        });
+
+        document.getElementById("cadPedidoId").value = "";
+        document.getElementById("cadCliente").value = "";
+        itensCadastroTemp = [];
+        renderizarItensCadastro();
+
+        mostrarToast("Agendamento registrado na fila!");
+        mudarAbaFaturista("fila");
+        renderizarTabelaAgendados();
+        setTimeout(carregarDados, 1500);
+      }
+    }
+
+    // Leitor de QR Code na Tela de Agendamento
+    function toggleQrAgenda() {
+      const container = document.getElementById("qrReaderAgendaContainer");
+      if (!container.classList.contains("hidden")) {
+        pararQrAgenda();
+        return;
+      }
+      container.classList.remove("hidden");
+      document.getElementById("txtBtnQrAgenda").textContent = "Fechar Câmera";
+
+      qrScannerAgenda = new Html5Qrcode("qrReaderAgenda");
+      qrScannerAgenda.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 240, height: 240 } },
+        (decodedText) => {
+          pararQrAgenda();
+          processarQrCodeLido(decodedText);
+        }
+      ).catch(() => {
+        mostrarToast("Não foi possível acessar a câmera", true);
+        pararQrAgenda();
+      });
+    }
+
+    function pararQrAgenda() {
+      const container = document.getElementById("qrReaderAgendaContainer");
+      container.classList.add("hidden");
+      document.getElementById("txtBtnQrAgenda").textContent = "Abrir Leitor de QR Code";
+      if (qrScannerAgenda) {
+        qrScannerAgenda.stop().catch(() => {});
+        qrScannerAgenda = null;
+      }
+    }
+
+    function processarQrCodeLido(texto) {
+      try {
+        const obj = JSON.parse(texto);
+        if (obj.pedido) document.getElementById("cadPedidoId").value = obj.pedido;
+        if (obj.cliente) document.getElementById("cadCliente").value = obj.cliente;
+        if (obj.itens && Array.isArray(obj.itens)) {
+          itensCadastroTemp = obj.itens;
+          renderizarItensCadastro();
+        }
+        mostrarToast("QR Code lido! Confira e clique em Registrar.");
+      } catch (e) {
+        const matchNum = texto.match(/\d{4,10}/);
+        document.getElementById("cadPedidoId").value = matchNum ? matchNum[0] : texto;
+        mostrarToast("Código lido! Complete cliente/itens e registre.");
+      }
+    }
+
+    // Iniciar Atendimento -> Grava chegada e abre Tela 2 (NF)
+    async function iniciarAtendimento(pedidoObj) {
+      const agoraStr = horaAtualFormatada();
+      pedidoAtivoFaturista = { ...pedidoObj, t_inicio: pedidoObj.t_inicio || agoraStr };
+
+      document.getElementById("ativoPedidoId").textContent = pedidoAtivoFaturista.pedido;
+      document.getElementById("ativoClienteNome").textContent = pedidoAtivoFaturista.cliente || "Cliente";
+      document.getElementById("ativoHoraInicio").textContent = pedidoAtivoFaturista.t_inicio;
+      document.getElementById("ativoItensResumo").textContent = pedidoAtivoFaturista.itens || "-";
+      document.getElementById("ativoInputNf").value = "";
+
+      mudarAbaFaturista("ativo");
+      setTimeout(() => document.getElementById("ativoInputNf").focus(), 150);
+
+      if ((pedidoObj.status || "").toLowerCase() === "agendado") {
+        pedidoObj.status = "Em Faturamento";
+        pedidoObj.t_inicio = agoraStr;
+        renderizarTabelaAgendados();
+
+        await enviarPost({
+          action: "iniciar_atendimento",
+          pedido: pedidoObj.pedido,
+          t_inicio: agoraStr
+        });
+      }
+    }
+
+    async function enviarParaExpedicao() {
+      if (!pedidoAtivoFaturista) return;
+      const nf = document.getElementById("ativoInputNf").value.trim();
+      if (!nf) {
+        return mostrarToast("Bipe ou digite o número da NF antes de enviar!", true);
+      }
+
+      const tNf = horaAtualFormatada();
+      const ok = await enviarPost({
+        action: "enviar_expedicao",
+        pedido: pedidoAtivoFaturista.pedido,
+        itens: pedidoAtivoFaturista.itens,
+        nf: nf,
+        t_inicio: pedidoAtivoFaturista.t_inicio,
+        t_nf: tNf
+      });
+
+      if (ok) {
+        todosPedidos = todosPedidos.map(p =>
+          String(p.pedido) === String(pedidoAtivoFaturista.pedido)
+            ? { ...p, status: "Aguardando Separação", nf, t_nf: tNf }
+            : p
+        );
+        pedidoAtivoFaturista = null;
+        document.getElementById("tabFatAtivo").classList.add("hidden");
+        mostrarToast("NF registrada! Pedido enviado para a Doca.");
+        mudarAbaFaturista("fila");
+        renderizarTabelaAgendados();
+        setTimeout(carregarDados, 1500);
+      }
+    }
+
+    // =========================================================================
+    // LÓGICA DO OPERADOR LOGÍSTICO (MANTIDA INTACTA + AVALIAÇÃO POR ESTRELAS)
+    // =========================================================================
+    function renderizarFilaOperador() {
+      const container = document.getElementById("opListaPedidos");
+      const fila = todosPedidos.filter(p => {
+        const st = (p.status || "").toLowerCase();
+        return st === "aguardando separação" || st === "em separação";
+      });
+
+      if (fila.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-slate-400 text-sm">
+            <i class="fa-solid fa-check-double text-2xl mb-2 block text-emerald-600"></i>
+            Nenhum caminhão aguardando carregamento na doca.
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = fila.map(p => `
+        <div class="p-4 rounded-xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 flex items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-base text-slate-800">Pedido #${p.pedido}</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">NF ${p.nf || "-"}</span>
+            </div>
+            <p class="text-xs font-semibold text-slate-600 mt-0.5">${p.cliente || "Cliente"}</p>
+            <p class="text-xs font-extrabold ifco-text mt-1">${p.itens || "-"}</p>
+          </div>
+          <button onclick='abrirRomaneioOperador(${JSON.stringify(p).replace(/'/g, "&apos;")})'
+            class="ifco-green text-white text-xs font-extrabold px-4 py-3 rounded-xl shadow-sm">
+            Atender <i class="fa-solid fa-chevron-right ml-1"></i>
+          </button>
+        </div>
+      `).join("");
+    }
+
+    async function abrirRomaneioOperador(pedidoObj, restoring = false) {
+      pedidoAtivoOperador = pedidoObj;
+      localStorage.setItem("ifco_op_ativo", JSON.stringify(pedidoObj));
+
+      document.getElementById("opListaContainer").classList.add("hidden");
+      document.getElementById("opRomaneioContainer").classList.remove("hidden");
+
+      document.getElementById("opRomPedido").textContent = pedidoObj.pedido;
+      document.getElementById("opRomNf").textContent = pedidoObj.nf || "-";
+      document.getElementById("opRomCliente").textContent = pedidoObj.cliente || "-";
+
+      npsSelecionado = "";
+      fotoBase64Resumo = "";
+      document.getElementById("opFotoStatus").classList.add("hidden");
+      document.getElementById("npsLabelTexto").textContent = "";
+      document.querySelectorAll(".star-btn").forEach(b => {
+        b.classList.remove("text-amber-400");
+        b.classList.add("text-slate-300");
+      });
+
+      const partes = (pedidoObj.itens || "").split("|").map(s => s.trim()).filter(Boolean);
+      document.getElementById("opChecklistItens").innerHTML = partes.map((item) => `
+        <label class="flex items-center gap-3 p-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 cursor-pointer">
+          <input type="checkbox" class="w-5 h-5 accent-[#007A33]" />
+          <span class="text-sm font-extrabold text-slate-800">${item}</span>
+        </label>
+      `).join("");
+
+      if (!restoring && (pedidoObj.status || "").toLowerCase() === "aguardando separação") {
+        await enviarPost({
+          action: "iniciar_separacao",
+          pedido: pedidoObj.pedido,
+          t_sep_ini: horaAtualFormatada()
+        });
+      }
+    }
+
+    function fecharRomaneioOperador() {
+      localStorage.removeItem("ifco_op_ativo");
+      pedidoAtivoOperador = null;
+      document.getElementById("opRomaneioContainer").classList.add("hidden");
+      document.getElementById("opListaContainer").classList.remove("hidden");
+    }
+
+    function selecionarEstrelas(nota) {
+      npsSelecionado = String(nota);
+      const legendas = {
+        1: "1 Estrela — Muito Ruim",
+        2: "2 Estrelas — Ruim",
+        3: "3 Estrelas — Regular",
+        4: "4 Estrelas — Bom",
+        5: "5 Estrelas — Excelente!"
+      };
+
+      const botoes = document.querySelectorAll(".star-btn");
+      botoes.forEach((btn, index) => {
+        if (index < nota) {
+          btn.classList.remove("text-slate-300");
+          btn.classList.add("text-amber-400");
+        } else {
+          btn.classList.remove("text-amber-400");
+          btn.classList.add("text-slate-300");
+        }
+      });
+
+      document.getElementById("npsLabelTexto").textContent = legendas[nota] || "";
+    }
+
+    function processarFotoOperador(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      fotoBase64Resumo = `Foto anexada (${file.name} - ${horaAtualFormatada()})`;
+      document.getElementById("opFotoStatus").classList.remove("hidden");
+    }
+
+    async function concluirCarregamentoOperador() {
+      if (!pedidoAtivoOperador) return;
+      if (!npsSelecionado) {
+        return mostrarToast("Peça para o motorista tocar nas estrelas para avaliar!", true);
+      }
+
+      const ok = await enviarPost({
+        action: "concluir",
+        pedido: pedidoAtivoOperador.pedido,
+        t_fim: horaAtualFormatada(),
+        nps: npsSelecionado,
+        foto: fotoBase64Resumo || "Sem foto"
+      });
+
+      if (ok) {
+        mostrarToast("Carregamento finalizado com sucesso!");
+        fecharRomaneioOperador();
+        setTimeout(carregarDados, 1200);
+      }
+    }
+
+    // =========================================================================
+    // UTILITÁRIOS
+    // =========================================================================
+    function horaAtualFormatada() {
+      const d = new Date();
+      return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    }
+
+    function toggleSync(ativo) {
+      const el = document.getElementById("syncIndicator");
+      if (ativo) {
+        el.classList.remove("hidden");
+        el.classList.add("flex");
+      } else {
+        el.classList.add("hidden");
+        el.classList.remove("flex");
+      }
+    }
+
+    function mostrarToast(msg, erro = false) {
+      const t = document.getElementById("toast");
+      const icon = document.getElementById("toastIcon");
+      document.getElementById("toastMsg").textContent = msg;
+      icon.className = erro ? "fa-solid fa-circle-exclamation text-amber-400" : "fa-solid fa-circle-check text-emerald-400";
+      t.classList.remove("hidden");
+      t.classList.add("flex");
+      setTimeout(() => {
+        t.classList.add("hidden");
+        t.classList.remove("flex");
+      }, 3200);
+    }
+  </script>
+</body>
+</html>
