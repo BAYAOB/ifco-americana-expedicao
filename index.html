@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>IFCO Expedição Nacional</title>
+  <title>IFCO Expedição Inteligente</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    body { font-family: 'Inter', sans-serif; background-color: #f3f6f4; -webkit-tap-highlight-color: transparent; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f6f4;
+      -webkit-tap-highlight-color: transparent;
+    }
     .ifco-green { background-color: #007A33; }
     .ifco-green-dark { background-color: #005A25; }
     .ifco-text { color: #007A33; }
@@ -19,7 +23,7 @@
 
   <!-- HEADER GLOBAL -->
   <header class="ifco-green text-white shadow-md sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
       <div class="flex items-center gap-3 cursor-pointer" onclick="voltarMenu()">
         <div class="bg-white text-[#007A33] font-black px-2.5 py-1 rounded text-lg tracking-tighter">IFCO</div>
         <div>
@@ -27,6 +31,7 @@
           <p class="text-[11px] text-emerald-100">Hub Central de Faturamento & Controle de Doca</p>
         </div>
       </div>
+
       <div class="flex items-center gap-2">
         <span id="syncIndicator" class="hidden text-xs bg-emerald-800 px-2.5 py-1 rounded-full items-center gap-1.5">
           <i class="fa-solid fa-rotate fa-spin"></i> Sincronizando
@@ -41,38 +46,60 @@
   <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-4">
 
-    <!-- ==================== TELA 0: MENU DE PERFIL ==================== -->
-    <section id="viewMenu" class="max-w-3xl mx-auto mt-6 space-y-4">
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 text-center">
-        <h2 class="text-xl font-extrabold text-slate-800">Selecione o Posto de Trabalho</h2>
+    <!-- ==================== TELA 0: MENU DE PERFIL (5 POSTOS) ==================== -->
+    <section id="viewMenu" class="max-w-6xl mx-auto mt-4 sm:mt-8 space-y-5">
+      <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 text-center">
+        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-800">Selecione o Posto de Trabalho</h2>
         <p class="text-sm text-slate-500 mt-1">Escolha a interface operacional para iniciar</p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-          <!-- Faturamento (Hub Nacional) -->
-          <button onclick="abrirPerfil('faturista')" class="group p-6 rounded-2xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-center flex flex-col items-center justify-center">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mt-6">
+          <!-- 1. Registrar Atendimento (Filiais / Portaria) -->
+          <button onclick="abrirPerfil('registrar')" class="group p-5 rounded-2xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-center flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-emerald-700 text-white flex items-center justify-center text-xl mb-3 group-hover:scale-105 transition">
+              <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <h3 class="font-extrabold text-sm sm:text-base text-slate-800">Registrar Atendimento</h3>
+            <p class="text-xs text-slate-500 mt-1">Filiais • Chegada e dados SAP</p>
+          </button>
+
+          <!-- 2. Faturamento (Hub Nacional) -->
+          <button onclick="abrirPerfil('faturista')" class="group p-5 rounded-2xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-center flex flex-col items-center justify-center relative">
+            <span id="badgeMenuFat" class="hidden absolute top-3 right-3 bg-amber-500 text-white text-[11px] font-black px-2 py-0.5 rounded-full">0</span>
             <div class="w-12 h-12 rounded-xl ifco-green text-white flex items-center justify-center text-xl mb-3 group-hover:scale-105 transition">
               <i class="fa-solid fa-file-invoice-dollar"></i>
             </div>
-            <h3 class="font-extrabold text-base text-slate-800">Faturamento</h3>
-            <p class="text-xs text-slate-500 mt-1">Hub Central • Agenda Brasil e registro de NF</p>
+            <h3 class="font-extrabold text-sm sm:text-base text-slate-800">Faturamento</h3>
+            <p class="text-xs text-slate-500 mt-1">Hub Central • Fila Brasil e NF</p>
           </button>
 
-          <!-- Operador Logístico (Acesso por Filial) -->
-          <button onclick="abrirModalLoginOperador()" class="group p-6 rounded-2xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-center flex flex-col items-center justify-center">
+          <!-- 3. Operador Logístico (Acesso por Filial) -->
+          <button onclick="abrirModalLoginOperador()" class="group p-5 rounded-2xl border-2 border-slate-200 hover:border-[#007A33] bg-slate-50 hover:bg-emerald-50/50 transition text-center flex flex-col items-center justify-center relative">
+            <span id="badgeMenuOp" class="hidden absolute top-3 right-3 bg-slate-800 text-white text-[11px] font-black px-2 py-0.5 rounded-full">0</span>
             <div class="w-12 h-12 rounded-xl bg-slate-800 text-white flex items-center justify-center text-xl mb-3 group-hover:scale-105 transition">
               <i class="fa-solid fa-dolly"></i>
             </div>
-            <h3 class="font-extrabold text-base text-slate-800">Operador Logístico</h3>
-            <p class="text-xs text-slate-500 mt-1">Fila exclusiva da filial, romaneio e NPS</p>
+            <h3 class="font-extrabold text-sm sm:text-base text-slate-800">Operador Logístico</h3>
+            <p class="text-xs text-slate-500 mt-1">Doca por filial, romaneio e NPS</p>
           </button>
 
-          <!-- Planilha / Relatório (Área Restrita) -->
-          <button onclick="abrirModalRestrito()" class="group p-6 rounded-2xl bg-[#16202A] hover:bg-[#1e2b38] border-2 border-[#16202A] hover:border-emerald-500 transition text-center flex flex-col items-center justify-center shadow-sm">
+          <!-- 4. Torre de Controle (Gestão Rápida - Protegida por Senha) -->
+          <button onclick="abrirModalRestrito('gestao')" class="group p-5 rounded-2xl border-2 border-emerald-200 hover:border-[#007A33] bg-emerald-50/40 hover:bg-emerald-50 transition text-center flex flex-col items-center justify-center">
+            <div class="w-12 h-12 rounded-xl bg-emerald-900 text-[#2AD182] flex items-center justify-center text-xl mb-3 group-hover:scale-105 transition">
+              <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <h3 class="font-extrabold text-sm sm:text-base text-slate-800">Torre de Controle</h3>
+            <span class="mt-2 inline-flex items-center gap-1 bg-emerald-900 text-[#2AD182] text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+              <i class="fa-solid fa-lock text-[9px]"></i> Gestão
+            </span>
+          </button>
+
+          <!-- 5. Planilha / Relatório (Área Restrita) -->
+          <button onclick="abrirModalRestrito('relatorio')" class="group p-5 rounded-2xl bg-[#16202A] hover:bg-[#1e2b38] border-2 border-[#16202A] hover:border-emerald-500 transition text-center flex flex-col items-center justify-center shadow-sm">
             <div class="w-12 h-12 rounded-xl bg-emerald-500/15 text-[#2AD182] flex items-center justify-center text-2xl mb-3 group-hover:scale-105 transition">
               <i class="fa-solid fa-table-cells-large"></i>
             </div>
-            <h3 class="font-extrabold text-base text-white">Planilha / Relatório</h3>
-            <span class="mt-2 inline-block bg-[#007A33] text-white text-[11px] font-bold px-3 py-1 rounded-full">
+            <h3 class="font-extrabold text-sm sm:text-base text-white">Planilha / Relatório</h3>
+            <span class="mt-2 inline-block bg-[#007A33] text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">
               Área Restrita
             </span>
           </button>
@@ -80,39 +107,186 @@
       </div>
     </section>
 
-    <!-- ==================== MÓDULO FATURISTA (HUB BRASIL) ==================== -->
+    <!-- ==================== MÓDULO 1: REGISTRAR ATENDIMENTO (FILIAIS) ==================== -->
+    <section id="viewRegistrar" class="hidden max-w-4xl mx-auto space-y-4">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider ifco-text">Recepção / Portaria da Filial</span>
+            <h2 class="text-xl font-extrabold text-slate-800">Registrar Atendimento de Motorista</h2>
+            <p class="text-xs text-slate-500">Os dados abaixo serão enviados imediatamente para a fila do Hub de Faturamento</p>
+          </div>
+          <button onclick="voltarMenu()" class="text-xs font-bold text-slate-500 hover:text-slate-800 underline self-start sm:self-center">
+            Voltar ao início
+          </button>
+        </div>
+
+        <!-- LEITURA QR CODE RÁPIDA -->
+        <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="text-xs font-bold text-[#007A33]">
+            <i class="fa-solid fa-qrcode mr-1"></i> Leitura rápida via QR Code (se disponível):
+          </div>
+          <button id="btnAbrirQrAgenda" onclick="toggleQrAgenda()" class="ifco-green hover:ifco-green-dark text-white text-xs font-bold py-2 px-4 rounded-lg transition inline-flex items-center justify-center gap-2">
+            <i class="fa-solid fa-camera"></i> <span id="txtBtnQrAgenda">Ler QR Code</span>
+          </button>
+        </div>
+        <div id="qrReaderAgendaContainer" class="hidden rounded-xl overflow-hidden border-2 border-[#007A33] bg-black max-w-sm mx-auto">
+          <div id="qrReaderAgenda" class="w-full"></div>
+        </div>
+
+        <!-- BLOCO 1: IDENTIFICAÇÃO DA FILIAL, PEDIDO, CLIENTE E MOTORISTA -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700">Dados Principais do Atendimento</h3>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Filial * (Ex: POA - RS)</label>
+              <input id="regFilial" type="text" placeholder="Ex: POA - RS" class="w-full border-2 border-emerald-200 bg-emerald-50/30 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold uppercase focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Nº do Pedido * (Ordem)</label>
+              <input id="regPedido" type="text" placeholder="Ex: 904512" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Código IFCO do Cliente *</label>
+              <input id="regCodigoCliente" type="text" placeholder="Ex: 5182" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">CNPJ *</label>
+              <input id="regCnpj" type="text" placeholder="04.004.419/0001-00" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-semibold focus:outline-none" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-700 mb-1">Razão Social *</label>
+              <input id="regRazaoSocial" type="text" placeholder="Ex: RESOL COMERCIO DE FRUTAS" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-bold uppercase focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Horário de Chegada *</label>
+              <div class="flex gap-1.5">
+                <input id="regHoraChegada" type="text" placeholder="HH:mm:ss" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-mono font-extrabold text-center focus:outline-none" />
+                <button type="button" onclick="atualizarHoraChegadaInput()" title="Atualizar para hora atual" class="px-3 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold">
+                  <i class="fa-solid fa-clock"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Nome do Motorista *</label>
+              <input id="regMotorista" type="text" placeholder="Ex: MARCO ANTONIO" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-bold uppercase focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Placa do Veículo *</label>
+              <input id="regPlaca" type="text" placeholder="Ex: EPG2A19" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold uppercase tracking-wider focus:outline-none" />
+            </div>
+          </div>
+
+          <!-- MODELO DE CAIXA E QUANTIDADE -->
+          <div class="bg-amber-50/70 p-4 rounded-xl border border-amber-200 space-y-3">
+            <label class="block text-xs font-extrabold text-slate-800 uppercase">
+              <i class="fa-solid fa-boxes-stacked mr-1 text-amber-600"></i> Modelo de Caixa & Quantidade *
+            </label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input id="cadModeloInput" type="text" placeholder="Modelo de Caixa (ex: ST6413)" onkeydown="if(event.key==='Enter') adicionarItemCadastro()" class="flex-1 border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-sm font-bold uppercase focus:outline-none focus:border-[#007A33]" />
+              <input id="cadQtdInput" type="number" min="1" placeholder="Quantidade (ex: 100)" onkeydown="if(event.key==='Enter') adicionarItemCadastro()" class="w-full sm:w-44 border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:border-[#007A33]" />
+              <button onclick="adicionarItemCadastro()" type="button" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition">
+                <i class="fa-solid fa-plus mr-1"></i> Adicionar
+              </button>
+            </div>
+            <div id="listaItensCadastro" class="space-y-1.5">
+              <p class="text-xs text-slate-500 italic">Digite o modelo e a quantidade acima (ou clique em + Adicionar para múltiplos modelos).</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOCO 2: PARÂMETROS COMERCIAIS / FISCAIS SAP -->
+        <div class="border-t border-slate-200 pt-5 space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#007A33]"></span>
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700">Dados Fiscais & Ordem SAP (Para o Hub de Faturamento)</h3>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Tipo de Ordem</label>
+              <input id="regTipoOrdem" type="text" placeholder="Ex: ZPA" class="w-full border border-slate-300 focus:border-[#007A33] rounded-xl px-3 py-2 text-sm font-bold uppercase focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Organização Vendas</label>
+              <input id="regOrgVendas" type="text" placeholder="Ex: 703" class="w-full border border-slate-300 focus:border-[#007A33] rounded-xl px-3 py-2 text-sm font-bold focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Canal de Distribuição</label>
+              <input id="regCanalDist" type="text" placeholder="Ex: Uso 7" class="w-full border border-slate-300 focus:border-[#007A33] rounded-xl px-3 py-2 text-sm font-bold focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Setor de Atividade</label>
+              <input id="regSetorAtiv" type="text" placeholder="Ex: 1" class="w-full border border-slate-300 focus:border-[#007A33] rounded-xl px-3 py-2 text-sm font-bold focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Escritório de Vendas</label>
+              <input id="regEscritorioVendas" type="text" placeholder="Ex: 739" class="w-full border border-slate-300 focus:border-[#007A33] rounded-xl px-3 py-2 text-sm font-bold focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Equipe de Vendas</label>
+              <input id="regEquipeVendas" type="text" placeholder="Ex: 73" class="w-full border border-slate-300 focus:border-[#007A33] rounded-xl px-3 py-2 text-sm font-bold focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Cód. Benefício Fiscal</label>
+              <input id="regBeneficioFiscal" type="text" placeholder="Ex: RS051" class="w-full border border-slate-300 focus:border-[#007A33] rounded-xl px-3 py-2 text-sm font-bold uppercase focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-600 mb-1">Necessidade Nota Palete</label>
+              <select id="regNotaPalete" class="w-full border border-slate-300 focus:border-[#007A33] rounded-xl px-3 py-2 text-sm font-bold bg-white focus:outline-none">
+                <option value="NÃO">NÃO</option>
+                <option value="SIM">SIM</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="salvarRegistroAtendimento()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-4 px-6 rounded-xl text-base shadow-lg transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i> Registrar Atendimento e Enviar para Fila do Faturamento
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 2: FATURAMENTO (HUB BRASIL) ==================== -->
     <section id="viewFaturista" class="hidden max-w-6xl mx-auto space-y-4">
 
-      <!-- Barra de Navegação Interna do Faturista -->
-      <div class="bg-white rounded-xl p-2 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-2">
-        <div class="flex flex-wrap gap-2">
+      <!-- Barra Superior do Faturista -->
+      <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2.5">
           <button id="tabFatFila" onclick="mudarAbaFaturista('fila')" class="px-4 py-2 rounded-lg text-sm font-bold ifco-green text-white transition flex items-center gap-2">
-            <i class="fa-solid fa-calendar-check"></i> Fila Brasil
+            <i class="fa-solid fa-list-check"></i> Fila de Faturamento (Brasil)
             <span id="badgeCountAgendados" class="bg-white text-[#007A33] text-xs px-2 py-0.5 rounded-full font-extrabold">0</span>
           </button>
-          <button id="tabFatCadastrar" onclick="mudarAbaFaturista('cadastrar')" class="px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition flex items-center gap-2">
-            <i class="fa-solid fa-plus-circle"></i> Cadastrar Agendamento
-          </button>
           <button id="tabFatAtivo" onclick="mudarAbaFaturista('ativo')" class="hidden px-4 py-2 rounded-lg text-sm font-bold bg-amber-500 text-white transition flex items-center gap-2">
-            <i class="fa-solid fa-bolt"></i> Atendimento Ativo
+            <i class="fa-solid fa-file-invoice"></i> Faturamento em Andamento
           </button>
         </div>
 
         <button onclick="carregarDados()" class="text-xs font-semibold text-slate-600 hover:text-[#007A33] px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
-          <i class="fa-solid fa-arrows-rotate mr-1"></i> Atualizar Lista
+          <i class="fa-solid fa-arrows-rotate mr-1"></i> Atualizar Fila
         </button>
       </div>
 
-      <!-- SUB-TELA FATURISTA 1: FILA DE PEDIDOS AGENDADOS (TODAS AS FILIAIS) -->
+      <!-- SUB-TELA FATURISTA 1: FILA ENXUTA NÍVEL BRASIL -->
       <div id="fatSubFila" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 class="font-extrabold text-base text-slate-800">Pedidos Agendados — Visão Geral (Todas as Filiais)</h2>
-            <p class="text-xs text-slate-500">Clique em <strong>Iniciar Atendimento</strong> assim que o motorista se apresentar</p>
+            <h2 class="font-extrabold text-base text-slate-800">Atendimentos Registrados pelas Filiais — Fila Brasil</h2>
+            <p class="text-xs text-slate-500">Ordenado por ordem de chegada • Semáforo: <span class="text-emerald-700 font-bold">0–8m</span> • <span class="text-amber-600 font-bold">8–20m</span> • <span class="text-red-600 font-bold">&gt;20m</span></p>
           </div>
           <div class="relative w-full sm:w-72">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-            <input id="buscaAgendados" onkeyup="renderizarTabelaAgendados()" type="text" placeholder="Buscar pedido, filial ou cliente..." class="w-full pl-8 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:border-[#007A33]" />
+            <input id="buscaAgendados" onkeyup="renderizarTabelaAgendados()" type="text" placeholder="Buscar pedido, cliente ou filial..." class="w-full pl-8 pr-3 py-2 text-xs border border-slate-300 rounded-lg focus:outline-none focus:border-[#007A33]" />
           </div>
         </div>
 
@@ -120,10 +294,9 @@
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wider border-b border-slate-200">
-                <th class="py-3 px-4 font-bold">Pedido (ID)</th>
                 <th class="py-3 px-4 font-bold">Filial</th>
-                <th class="py-3 px-4 font-bold">Data Agendada</th>
-                <th class="py-3 px-4 font-bold">Cliente / Solicitante</th>
+                <th class="py-3 px-4 font-bold">Cliente (Razão Social)</th>
+                <th class="py-3 px-4 font-bold">Chegada & Tempo na Fila</th>
                 <th class="py-3 px-4 font-bold">Modelo & Quantidade</th>
                 <th class="py-3 px-4 font-bold text-right">Ação</th>
               </tr>
@@ -133,121 +306,58 @@
         </div>
       </div>
 
-      <!-- SUB-TELA FATURISTA 2: CADASTRAR AGENDAMENTO / PEDIDO -->
-      <div id="fatSubCadastrar" class="hidden max-w-3xl mx-auto space-y-4">
+      <!-- SUB-TELA FATURISTA 2: FICHA COMPLETA DO PEDIDO + CAMPO DE NF -->
+      <div id="fatSubAtivo" class="hidden max-w-4xl mx-auto">
         <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-5">
-          <div class="border-b border-slate-100 pb-3">
-            <span class="text-xs font-extrabold uppercase tracking-wider ifco-text">Pré-Cadastro de Expedição</span>
-            <h2 class="text-lg font-extrabold text-slate-800">Registrar Pedido Agendado</h2>
-          </div>
-
-          <!-- OPÇÃO A: LER QR CODE -->
-          <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-4 space-y-3">
-            <p class="text-xs font-extrabold uppercase tracking-wide text-[#007A33]">
-              <i class="fa-solid fa-qrcode mr-1"></i> Opção A: Ler QR Code do Pedido (App IFCO / Motorista)
-            </p>
-            <button id="btnAbrirQrAgenda" onclick="toggleQrAgenda()" class="w-full ifco-green hover:ifco-green-dark text-white font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-sm">
-              <i class="fa-solid fa-camera"></i> <span id="txtBtnQrAgenda">Abrir Leitor de QR Code</span>
-            </button>
-            <div id="qrReaderAgendaContainer" class="hidden rounded-xl overflow-hidden border-2 border-[#007A33] bg-black">
-              <div id="qrReaderAgenda" class="w-full"></div>
-            </div>
-          </div>
-
-          <div class="relative flex py-1 items-center">
-            <div class="flex-grow border-t border-slate-200"></div>
-            <span class="flex-shrink mx-3 text-[11px] font-bold uppercase text-slate-400">Ou digitação manual</span>
-            <div class="flex-grow border-t border-slate-200"></div>
-          </div>
-
-          <!-- OPÇÃO B: DIGITAÇÃO MANUAL -->
-          <div class="space-y-4">
-            <p class="text-xs font-extrabold uppercase tracking-wide text-slate-700">
-              <i class="fa-solid fa-keyboard mr-1"></i> Opção B: Dados do Agendamento
-            </p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Nº do Pedido *</label>
-                <input id="cadPedidoId" type="text" placeholder="Ex: 6917" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none" />
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Filial de Expedição * (Digitação Livre)</label>
-                <input id="cadFilial" type="text" placeholder="Ex: AMERICANA" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold uppercase focus:outline-none" />
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Cliente / Solicitante *</label>
-                <input id="cadCliente" type="text" placeholder="Ex: CITRICA BARDIN" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm focus:outline-none" />
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-600 mb-1">Data Agendada *</label>
-                <input id="cadData" type="date" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-bold text-slate-800 focus:outline-none" />
-              </div>
-            </div>
-
-            <!-- Adição de Modelos e Quantidades (DIGITAÇÃO LIVRE) -->
-            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
-              <label class="block text-xs font-bold text-slate-700">Modelos e Quantidades de Caixas *</label>
-              <div class="flex flex-col sm:flex-row gap-2">
-                <input id="cadModeloInput" type="text" placeholder="Modelo (ex: 6413)" onkeydown="if(event.key==='Enter') adicionarItemCadastro()" class="flex-1 border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-sm font-bold uppercase focus:outline-none focus:border-[#007A33]" />
-                <input id="cadQtdInput" type="number" min="1" placeholder="Qtd (ex: 500)" onkeydown="if(event.key==='Enter') adicionarItemCadastro()" class="w-full sm:w-36 border border-slate-300 bg-white rounded-xl px-3 py-2.5 text-sm font-bold focus:outline-none focus:border-[#007A33]" />
-                <button onclick="adicionarItemCadastro()" type="button" class="bg-slate-800 hover:bg-slate-900 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition">
-                  <i class="fa-solid fa-plus mr-1"></i> Adicionar
-                </button>
-              </div>
-
-              <div id="listaItensCadastro" class="space-y-1.5">
-                <p class="text-xs text-slate-400 italic">Nenhum item adicionado ainda.</p>
-              </div>
-            </div>
-
-            <button onclick="salvarAgendamento()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-3.5 px-6 rounded-xl text-base shadow-md transition flex items-center justify-center gap-2">
-              <i class="fa-solid fa-check-circle"></i> Registrar Agendamento
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- SUB-TELA FATURISTA 3: TELA DE NF (ATENDIMENTO ATIVO) -->
-      <div id="fatSubAtivo" class="hidden max-w-2xl mx-auto">
-        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-5">
-          <div class="flex items-start justify-between border-b border-slate-100 pb-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
             <div>
-              <div class="flex flex-wrap items-center gap-2 mb-2">
+              <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                <span class="px-3 py-1 rounded-md text-xs font-extrabold bg-[#007A33] text-white uppercase">
+                  FILIAL: <span id="ativoFilialBadge">---</span>
+                </span>
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
                   <i class="fa-solid fa-clock"></i> Chegada: <span id="ativoHoraInicio">--:--</span>
                 </span>
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-extrabold bg-slate-800 text-white">
-                  <i class="fa-solid fa-location-dot text-emerald-400"></i> <span id="ativoFilialBadge">---</span>
-                </span>
               </div>
-              <h2 class="text-xl font-extrabold text-slate-800">Pedido #<span id="ativoPedidoId">---</span></h2>
-              <p id="ativoClienteNome" class="text-sm font-semibold text-slate-600 mt-0.5">---</p>
+              <h2 class="text-xl font-extrabold text-slate-800">
+                Pedido #<span id="ativoPedidoId">---</span> • <span id="ativoClienteNome">---</span>
+              </h2>
+              <p class="text-xs font-bold text-slate-500 mt-0.5">
+                Código IFCO do Cliente: <span id="ativoCodigoClienteBadge" class="text-slate-800 font-extrabold">---</span>
+              </p>
             </div>
-            <button onclick="mudarAbaFaturista('fila')" class="text-xs text-slate-500 hover:text-slate-800 underline">Voltar à fila</button>
+            <button onclick="cancelarFaturamentoAtivo()" class="text-xs font-bold text-slate-500 hover:text-slate-800 underline self-start">
+              Voltar à fila
+            </button>
           </div>
 
-          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200">
-            <p class="text-xs font-bold uppercase text-slate-500 mb-2">Itens do Pedido</p>
-            <div id="ativoItensResumo" class="text-sm font-bold text-slate-800 space-y-1"></div>
+          <!-- Ficha Completa Cadastrada pela Filial -->
+          <div class="rounded-xl border border-slate-300 overflow-hidden">
+            <div class="bg-[#007A33] text-white text-xs font-extrabold uppercase tracking-wider px-4 py-2 text-center">
+              Ficha Completa do Atendimento (Clique no ícone para copiar)
+            </div>
+            <div id="ativoFichaCompleta" class="divide-y divide-slate-200 text-xs"></div>
           </div>
 
-          <div class="space-y-2">
-            <label class="block text-sm font-extrabold text-slate-700">
-              <i class="fa-solid fa-barcode mr-1 ifco-text"></i> Bipar ou Digitar Número da Nota Fiscal (NF-e) *
-            </label>
-            <input id="ativoInputNf" type="text" placeholder="Passe o leitor na NF ou digite o número..." class="w-full border-2 border-[#007A33] rounded-xl px-4 py-3.5 text-lg font-extrabold tracking-wide focus:outline-none bg-emerald-50/30" />
-          </div>
+          <!-- Campo de NF e Envio para Expedição -->
+          <div class="bg-emerald-50/60 border-2 border-[#007A33] rounded-2xl p-5 space-y-4">
+            <div>
+              <label class="block text-sm font-extrabold text-slate-800 mb-1.5">
+                <i class="fa-solid fa-barcode mr-1 ifco-text"></i> Nº da Nota Fiscal Faturada (NF-e) *
+              </label>
+              <input id="ativoInputNf" type="text" placeholder="Digite ou bipe o número da NF faturada..." class="w-full border-2 border-slate-300 focus:border-[#007A33] rounded-xl px-4 py-3.5 text-lg font-extrabold tracking-wide focus:outline-none bg-white" />
+            </div>
 
-          <button onclick="enviarParaExpedicao()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-4 px-6 rounded-xl text-base shadow-lg transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-paper-plane"></i> Finalizar NF e Enviar para Fila da Doca
-          </button>
+            <button onclick="enviarParaExpedicao()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-4 px-6 rounded-xl text-base shadow-lg transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-paper-plane"></i> Enviar para Expedição
+            </button>
+          </div>
         </div>
       </div>
 
     </section>
 
-    <!-- ==================== MÓDULO OPERADOR LOGÍSTICO (FILTRADO POR FILIAL) ==================== -->
+    <!-- ==================== MÓDULO 3: OPERADOR LOGÍSTICO ==================== -->
     <section id="viewOperador" class="hidden max-w-2xl mx-auto space-y-4">
 
       <!-- Banner de Identificação da Filial Logada -->
@@ -308,7 +418,7 @@
         <div class="bg-emerald-50/60 p-5 rounded-xl border border-emerald-200 text-center space-y-3">
           <p class="text-sm font-extrabold text-slate-800">Avaliação do Motorista (Atendimento Pátio)</p>
           <p class="text-xs text-slate-500">Toque nas estrelas de 1 a 5 para avaliar</p>
-          
+
           <div class="flex justify-center items-center gap-3 py-1" id="npsStarsContainer">
             <button type="button" onclick="selecionarEstrelas(1)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none"><i class="fa-solid fa-star"></i></button>
             <button type="button" onclick="selecionarEstrelas(2)" class="star-btn text-4xl text-slate-300 hover:scale-110 transition focus:outline-none"><i class="fa-solid fa-star"></i></button>
@@ -327,7 +437,7 @@
 
     </section>
 
-    <!-- ==================== MÓDULO RELATÓRIO DE ATENDIMENTOS (ÁREA RESTRITA) ==================== -->
+    <!-- ==================== MÓDULO 4: RELATÓRIO DE ATENDIMENTOS (ÁREA RESTRITA) ==================== -->
     <section id="viewRelatorio" class="hidden space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div class="flex items-center gap-2.5">
@@ -365,9 +475,9 @@
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-slate-100 text-slate-700 text-[11px] uppercase tracking-wider font-extrabold border-b border-slate-200 whitespace-nowrap">
-                <th class="py-3 px-3.5">Pedido / Cliente</th>
+                <th class="py-3 px-3.5">Pedido / Cód. Cliente / Razão Social</th>
                 <th class="py-3 px-3.5">Filial</th>
-                <th class="py-3 px-3.5">Data Agenda</th>
+                <th class="py-3 px-3.5">Data</th>
                 <th class="py-3 px-3.5">NF</th>
                 <th class="py-3 px-3.5">Itens / Romaneio</th>
                 <th class="py-3 px-3.5">Status</th>
@@ -381,6 +491,208 @@
             </thead>
             <tbody id="tbodyRelatorio" class="divide-y divide-slate-200 text-xs"></tbody>
           </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MÓDULO 5: TORRE DE CONTROLE (GERÊNCIA - COM SENHA) ==================== -->
+    <section id="viewGestao" class="hidden space-y-5">
+      <!-- Cabeçalho e Filtro Geral / Filial -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-[#16202A] text-[#2AD182] flex items-center justify-center text-xl shadow-xs">
+            <i class="fa-solid fa-gauge-high"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-lg sm:text-xl font-extrabold text-slate-800">Torre de Controle — Gestão Executiva</h2>
+              <span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping"></span> Ao Vivo
+              </span>
+            </div>
+            <p class="text-xs text-slate-500">Acompanhamento operacional em tempo real, SLA (Planejado × Realizado) e eficiência</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2.5">
+          <div class="flex items-center gap-2 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200">
+            <i class="fa-solid fa-filter text-slate-500 text-xs"></i>
+            <label for="filtroGestaoFilial" class="text-xs font-bold text-slate-600">Unidade:</label>
+            <select id="filtroGestaoFilial" onchange="renderizarTorreControle()" class="bg-transparent text-xs font-extrabold text-slate-900 focus:outline-none cursor-pointer">
+              <option value="TODAS">BRASIL (VISÃO GERAL)</option>
+            </select>
+          </div>
+
+          <button onclick="carregarDados()" class="bg-emerald-50 hover:bg-emerald-100 text-[#007A33] border border-emerald-200 text-xs font-bold px-3.5 py-2.5 rounded-xl transition inline-flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate"></i> Atualizar
+          </button>
+
+          <button onclick="voltarMenu()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold px-3.5 py-2.5 rounded-xl transition inline-flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-left"></i> Início
+          </button>
+        </div>
+      </div>
+
+      <!-- 1. PAINEL DE CARREGAMENTO — ACOMPANHAMENTO OPERACIONAL EM TEMPO REAL -->
+      <div class="space-y-2.5">
+        <div class="flex flex-wrap items-center justify-between gap-2 px-1">
+          <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+            <i class="fa-solid fa-truck-fast text-[#007A33]"></i> 1. Painel de Carregamento (Status em Tempo Real)
+          </h3>
+          <span class="text-[11px] text-slate-500 font-semibold">Semáforo Fila Fat.: <span class="text-emerald-700 font-bold">0–8m</span> • <span class="text-amber-600 font-bold">8–20m</span> • <span class="text-red-600 font-bold">&gt;20m</span></span>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span class="text-[11px] font-bold uppercase">Fila Faturamento</span>
+              <i class="fa-solid fa-clock text-blue-600"></i>
+            </div>
+            <p id="kpiFilaFat" class="text-2xl font-black text-slate-800">0</p>
+            <p id="kpiFilaFatCritico" class="text-[11px] font-bold text-slate-400 mt-1">0 acima de 20 min</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span class="text-[11px] font-bold uppercase">Em Faturamento</span>
+              <i class="fa-solid fa-file-invoice-dollar text-amber-500"></i>
+            </div>
+            <p id="kpiEmFat" class="text-2xl font-black text-slate-800">0</p>
+            <p class="text-[11px] font-semibold text-slate-400 mt-1">Em emissão de NF</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span class="text-[11px] font-bold uppercase">Aguardando Doca</span>
+              <i class="fa-solid fa-truck-ramp-box text-indigo-600"></i>
+            </div>
+            <p id="kpiAguardDoca" class="text-2xl font-black text-slate-800">0</p>
+            <p class="text-[11px] font-semibold text-slate-400 mt-1">NF liberada para pátio</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span class="text-[11px] font-bold uppercase">Em Carregamento</span>
+              <i class="fa-solid fa-dolly text-orange-600"></i>
+            </div>
+            <p id="kpiEmSep" class="text-2xl font-black text-slate-800">0</p>
+            <p class="text-[11px] font-semibold text-slate-400 mt-1">Operador na doca</p>
+          </div>
+
+          <div class="col-span-2 sm:col-span-1 bg-emerald-900 text-white rounded-2xl p-4 shadow-xs">
+            <div class="flex items-center justify-between text-emerald-200 mb-1">
+              <span class="text-[11px] font-bold uppercase">Concluídos</span>
+              <i class="fa-solid fa-circle-check text-[#2AD182]"></i>
+            </div>
+            <p id="kpiConcluidos" class="text-2xl font-black text-white">0</p>
+            <p id="kpiTotalCaminhoes" class="text-[11px] font-semibold text-emerald-200 mt-1">de 0 atendimentos</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. TEMPOS DE ESPERA (PLANEJADO X REALIZADO) & 3. PRODUTIVIDADE -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div class="lg:col-span-7 bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-stopwatch text-[#007A33]"></i> 2. Tempos de Espera: Planejado × Realizado
+              </h3>
+              <p class="text-xs text-slate-500">Comparativo entre meta operacional (SLA) e tempo médio real</p>
+            </div>
+            <span class="text-[11px] font-bold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg">Meta Total: 33 min</span>
+          </div>
+
+          <div id="containerPlanejadoRealizado" class="space-y-4"></div>
+        </div>
+
+        <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-col justify-between space-y-4">
+          <div>
+            <div class="border-b border-slate-100 pb-3 mb-4">
+              <h3 class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-bolt text-amber-500"></i> 3. Produtividade & Eficiência
+              </h3>
+              <p class="text-xs text-slate-500">Volume movimentado, cumprimento de SLA e NPS</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+                <span class="text-[11px] font-bold text-slate-500 uppercase">Volume Expedido</span>
+                <p id="kpiTotalCaixas" class="text-xl font-black text-slate-800 mt-1">0 cx</p>
+                <span id="kpiMediaCaixas" class="text-[11px] text-slate-500 font-semibold">Média: 0 cx/carga</span>
+              </div>
+
+              <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+                <span class="text-[11px] font-bold text-slate-500 uppercase">Eficiência SLA</span>
+                <p id="kpiEficienciaSla" class="text-xl font-black text-[#007A33] mt-1">100%</p>
+                <span class="text-[11px] text-slate-500 font-semibold">Dentro da meta</span>
+              </div>
+
+              <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+                <span class="text-[11px] font-bold text-slate-500 uppercase">Satisfação (NPS)</span>
+                <p id="kpiNpsMedio" class="text-xl font-black text-amber-500 mt-1">- ★</p>
+                <span id="kpiNpsQtd" class="text-[11px] text-slate-500 font-semibold">0 avaliações</span>
+              </div>
+
+              <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+                <span class="text-[11px] font-bold text-slate-500 uppercase">Gargalo Atual</span>
+                <p id="kpiGargaloAtual" class="text-sm font-black text-slate-800 mt-1.5">Operação Fluida</p>
+                <span id="kpiGargaloSub" class="text-[11px] text-slate-500 font-semibold">Sem alertas críticos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-900 flex items-center justify-between">
+            <span class="font-bold"><i class="fa-solid fa-table-cells mr-1 text-[#007A33]"></i> Detalhamento analítico:</span>
+            <button onclick="abrirRelatorioDiretoDaTorre()" class="font-extrabold underline text-[#007A33] hover:text-emerald-950">Abrir Planilha</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. COMPARATIVO POR FILIAL + MONITORAMENTO AO VIVO DE CARREGAMENTOS -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="p-4 border-b border-slate-100 bg-slate-50/70">
+            <h3 class="text-sm font-extrabold text-slate-800">Desempenho por Filial</h3>
+            <p class="text-[11px] text-slate-500">Clique em uma filial para filtrar todo o painel</p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 text-[10px] uppercase font-extrabold border-b border-slate-200">
+                  <th class="py-2.5 px-3">Filial</th>
+                  <th class="py-2.5 px-3 text-center">Ativos</th>
+                  <th class="py-2.5 px-3 text-center">Concl.</th>
+                  <th class="py-2.5 px-3 text-right">Caixas</th>
+                  <th class="py-2.5 px-3 text-right">Ciclo Méd.</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyGestaoFiliais" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+          <div class="p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-800">Acompanhamento de Veículos no Pátio</h3>
+              <p class="text-[11px] text-slate-500">Etapa atual e tempo decorrido desde a chegada</p>
+            </div>
+            <span id="badgeVeiculosPatio" class="text-xs font-extrabold bg-slate-800 text-white px-2.5 py-1 rounded-lg">0 veículos</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 text-[10px] uppercase font-extrabold border-b border-slate-200">
+                  <th class="py-2.5 px-3">Filial</th>
+                  <th class="py-2.5 px-3">Pedido / Cliente</th>
+                  <th class="py-2.5 px-3">Etapa Atual</th>
+                  <th class="py-2.5 px-3 text-right">Tempo Pátio</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyGestaoVeiculos" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
@@ -408,7 +720,7 @@
       <div class="space-y-3">
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Filial (Digitação Livre)</label>
-          <input id="inputLoginFilial" type="text" placeholder="Ex: AMERICANA" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold uppercase focus:outline-none" />
+          <input id="inputLoginFilial" type="text" placeholder="Ex: AMERICANA ou POA - RS" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-3 py-2.5 text-sm font-extrabold uppercase focus:outline-none" />
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Senha da Filial</label>
@@ -421,7 +733,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE SENHA DA ÁREA RESTRITA -->
+  <!-- MODAL DE SENHA DA GESTÃO (TORRE DE CONTROLE E ÁREA RESTRITA) -->
   <div id="modalRestrito" class="fixed inset-0 z-50 hidden bg-slate-900/70 backdrop-blur-xs items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -430,8 +742,8 @@
             <i class="fa-solid fa-lock"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-base text-slate-800">Área Restrita</h3>
-            <p class="text-xs text-slate-500">Relatório e Planilha Gerencial</p>
+            <h3 id="tituloModalRestrito" class="font-extrabold text-base text-slate-800">Acesso Restrito — Gerência</h3>
+            <p id="subtituloModalRestrito" class="text-xs text-slate-500">Informe a senha gerencial para continuar</p>
           </div>
         </div>
         <button onclick="fecharModalRestrito()" class="text-slate-400 hover:text-slate-700 text-lg">
@@ -440,10 +752,10 @@
       </div>
 
       <div class="space-y-3">
-        <label class="block text-xs font-bold text-slate-600">Digite a senha de acesso:</label>
+        <label class="block text-xs font-bold text-slate-600">Digite a senha da gerência:</label>
         <input id="inputSenhaRestrita" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter') validarSenhaRestrita()" class="w-full border-2 border-slate-200 focus:border-[#007A33] rounded-xl px-4 py-3 text-center text-lg font-extrabold tracking-widest focus:outline-none" />
         <button onclick="validarSenhaRestrita()" class="w-full ifco-green hover:ifco-green-dark text-white font-extrabold py-3 rounded-xl text-sm transition">
-          Acessar Relatório
+          Liberar Acesso
         </button>
       </div>
     </div>
@@ -457,7 +769,7 @@
 
   <script>
     // =========================================================================
-    // CONFIGURAÇÃO E ESTADO GLOBAL (V3 MULTI-FILIAL BLINDADO MOBILE)
+    // CONFIGURAÇÃO E ESTADO GLOBAL (PRODUÇÃO GOOGLE SHEETS)
     // =========================================================================
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxaSH6HpGUX27waLqdqUN8V4DAKvR4kSqLhkDlBTcdgycF7Bz0WZIvAWgpuZEA2Dq8o/exec";
     const PLANILHA_URL = "https://docs.google.com/spreadsheets";
@@ -480,6 +792,8 @@
     let fotoBase64Resumo = "";
     let qrScannerAgenda = null;
     let wakeLock = null;
+    let intervaloCronometroFila = null;
+    let destinoAposSenhaGestao = "relatorio";
 
     function strLower(val) {
       return String(val ?? "").trim().toLowerCase();
@@ -500,26 +814,94 @@
       return match ? match[1] : s;
     }
 
-    function formatarDataBr(isoStr) {
-      const s = String(isoStr ?? "").trim();
-      if (!s) return "";
-      if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
-        const [ano, mes, dia] = s.split("-");
-        return `${dia}/${mes}/${ano}`;
-      }
-      return s;
+    function dataHojeBr() {
+      const agora = new Date();
+      return `${String(agora.getDate()).padStart(2, '0')}/${String(agora.getMonth() + 1).padStart(2, '0')}/${agora.getFullYear()}`;
     }
 
-    function definirDataHojeInput() {
-      const agora = new Date();
-      const ano = agora.getFullYear();
-      const mes = String(agora.getMonth() + 1).padStart(2, '0');
-      const dia = String(agora.getDate()).padStart(2, '0');
-      document.getElementById("cadData").value = `${ano}-${mes}-${dia}`;
+    function atualizarHoraChegadaInput() {
+      document.getElementById("regHoraChegada").value = horaAtualFormatada();
+    }
+
+    function copiarCampo(texto) {
+      if (!texto || texto === "-") return;
+      const temp = document.createElement("textarea");
+      temp.value = texto;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand("copy");
+      document.body.removeChild(temp);
+      mostrarToast(`Copiado: ${texto}`);
     }
 
     // =========================================================================
-    // BLINDAGEM DE SESSÃO E TELA ATIVA (EVITA PERDA NO CELULAR DO OPERADOR)
+    // CRONÔMETRO SLA AO VIVO (0-8m VERDE | 8-20m AMARELO | >20m VERMELHO)
+    // =========================================================================
+    function segundosDesdeHora(horaStr) {
+      const limpa = limparHoraExibicao(horaStr);
+      if (!limpa || limpa === "-") return 0;
+      const partes = limpa.split(":").map(Number);
+      if (partes.length < 2 || partes.some(isNaN)) return 0;
+      const agora = new Date();
+      const inicio = new Date(
+        agora.getFullYear(),
+        agora.getMonth(),
+        agora.getDate(),
+        partes[0],
+        partes[1],
+        partes[2] || 0
+      );
+      let diffSeg = Math.floor((agora.getTime() - inicio.getTime()) / 1000);
+      if (diffSeg < 0) diffSeg += 86400;
+      return diffSeg;
+    }
+
+    function formatarCronometroFila(diffSeg) {
+      const h = Math.floor(diffSeg / 3600);
+      const m = Math.floor((diffSeg % 3600) / 60);
+      const s = diffSeg % 60;
+      if (h > 0) {
+        return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+      }
+      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+
+    function obterEstiloSlaFila(diffSeg) {
+      const minutos = diffSeg / 60;
+      if (minutos > 20) {
+        return {
+          badge: "bg-red-600 text-white border-red-700 animate-pulse shadow-xs",
+          icone: "fa-solid fa-fire-flame-curved",
+          row: "bg-red-50/40 hover:bg-red-50/70"
+        };
+      }
+      if (minutos >= 8) {
+        return {
+          badge: "bg-amber-100 text-amber-900 border-amber-300",
+          icone: "fa-solid fa-hourglass-half",
+          row: "bg-amber-50/25 hover:bg-amber-50/50"
+        };
+      }
+      return {
+        badge: "bg-emerald-50 text-emerald-800 border-emerald-200",
+        icone: "fa-regular fa-clock",
+        row: "hover:bg-slate-50"
+      };
+    }
+
+    function atualizarCronometrosAoVivo() {
+      const badges = document.querySelectorAll("[data-cronometro-inicio]");
+      badges.forEach(el => {
+        const horaInicio = el.getAttribute("data-cronometro-inicio");
+        const diffSeg = segundosDesdeHora(horaInicio);
+        const estilo = obterEstiloSlaFila(diffSeg);
+        el.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono text-xs font-extrabold transition-colors ${estilo.badge}`;
+        el.innerHTML = `<i class="${estilo.icone}"></i> <span>${formatarCronometroFila(diffSeg)}</span>`;
+      });
+    }
+
+    // =========================================================================
+    // BLINDAGEM DE SESSÃO E TELA ATIVA (WHATSAPP / RECARREGAMENTO MOBILE)
     // =========================================================================
     async function ativarTelaSempreLigada() {
       try {
@@ -540,13 +922,12 @@
     function salvarEstadoRomaneioLocal() {
       if (!pedidoAtivoOperador) return;
       const checkboxes = Array.from(document.querySelectorAll("#opChecklistItens input[type='checkbox']")).map(cb => cb.checked);
-      const estado = {
+      localStorage.setItem("ifco_v3_op_ativo", JSON.stringify({
         pedidoObj: pedidoAtivoOperador,
         checkboxes,
         nps: npsSelecionado,
         foto: fotoBase64Resumo
-      };
-      localStorage.setItem("ifco_v3_op_ativo", JSON.stringify(estado));
+      }));
     }
 
     document.addEventListener("visibilitychange", () => {
@@ -557,14 +938,30 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("linkPlanilhaDireto").href = PLANILHA_URL;
-      definirDataHojeInput();
+      atualizarHoraChegadaInput();
+
+      const savedFilialPortaria = localStorage.getItem("ifco_v3_filial_portaria");
+      if (savedFilialPortaria) {
+        document.getElementById("regFilial").value = savedFilialPortaria;
+      }
 
       const savedOpRaw = localStorage.getItem("ifco_v3_op_ativo");
+      const savedFatRaw = localStorage.getItem("ifco_v3_fat_ativo");
       const savedPerfil = localStorage.getItem("ifco_v3_perfil_atual");
       const savedFilial = localStorage.getItem("ifco_v3_filial_op");
 
       if (savedPerfil === "faturista") {
         abrirPerfil("faturista");
+        if (savedFatRaw) {
+          try {
+            const pObj = JSON.parse(savedFatRaw);
+            iniciarAtendimento(pObj, true);
+          } catch (e) {
+            localStorage.removeItem("ifco_v3_fat_ativo");
+          }
+        }
+      } else if (savedPerfil === "registrar") {
+        abrirPerfil("registrar");
       } else if ((savedPerfil === "operador" || savedOpRaw) && savedFilial) {
         filialOperadorLogada = savedFilial;
         abrirPerfil("operador");
@@ -577,6 +974,8 @@
             localStorage.removeItem("ifco_v3_op_ativo");
           }
         }
+      } else {
+        carregarDados();
       }
     });
 
@@ -636,10 +1035,16 @@
     }
 
     // =========================================================================
-    // ÁREA RESTRITA (SENHA -> ABRE TELA DE RELATÓRIO)
+    // SENHA DA GERÊNCIA (TORRE DE CONTROLE E ÁREA RESTRITA)
     // =========================================================================
-    function abrirModalRestrito() {
+    function abrirModalRestrito(destino = "relatorio") {
+      destinoAposSenhaGestao = destino;
       document.getElementById("inputSenhaRestrita").value = "";
+      document.getElementById("tituloModalRestrito").textContent =
+        destino === "gestao" ? "Torre de Controle — Gerência" : "Área Restrita — Planilha";
+      document.getElementById("subtituloModalRestrito").textContent =
+        destino === "gestao" ? "Painel executivo de KPIs e SLA em tempo real" : "Relatório completo e acesso ao Google Sheets";
+
       const modal = document.getElementById("modalRestrito");
       modal.classList.remove("hidden");
       modal.classList.add("flex");
@@ -655,80 +1060,35 @@
     async function validarSenhaRestrita() {
       const digitada = document.getElementById("inputSenhaRestrita").value.trim();
       if (digitada !== SENHA_GESTAO) {
-        return mostrarToast("Senha incorreta!", true);
+        return mostrarToast("Senha gerencial incorreta!", true);
       }
       fecharModalRestrito();
-      document.getElementById("viewMenu").classList.add("hidden");
-      document.getElementById("viewFaturista").classList.add("hidden");
-      document.getElementById("viewOperador").classList.add("hidden");
-      document.getElementById("viewRelatorio").classList.remove("hidden");
+      esconderTodasTelas();
       document.getElementById("btnMenuTop").classList.remove("hidden");
-      await carregarDados();
+
+      if (destinoAposSenhaGestao === "gestao") {
+        document.getElementById("viewGestao").classList.remove("hidden");
+        await carregarDados();
+      } else {
+        document.getElementById("viewRelatorio").classList.remove("hidden");
+        await carregarDados();
+      }
     }
 
-    function renderizarRelatorio() {
-      const tbody = document.getElementById("tbodyRelatorio");
-      const termo = strLower(document.getElementById("buscaRelatorio").value);
+    function abrirRelatorioDiretoDaTorre() {
+      esconderTodasTelas();
+      document.getElementById("viewRelatorio").classList.remove("hidden");
+      document.getElementById("btnMenuTop").classList.remove("hidden");
+      renderizarRelatorio();
+    }
 
-      const filtrados = todosPedidos.filter(p => {
-        if (!termo) return true;
-        return (
-          strLower(p.pedido).includes(termo) ||
-          strLower(p.filial).includes(termo) ||
-          strLower(p.cliente).includes(termo) ||
-          strLower(p.nf).includes(termo) ||
-          strLower(p.itens).includes(termo) ||
-          strLower(p.status).includes(termo) ||
-          strLower(p.agendamento).includes(termo) ||
-          strLower(p.data).includes(termo)
-        );
-      });
-
-      document.getElementById("relatorioCount").textContent = filtrados.length;
-
-      if (filtrados.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="12" class="py-10 text-center text-slate-400 text-sm">
-              Nenhum registro encontrado na planilha.
-            </td>
-          </tr>`;
-        return;
-      }
-
-      tbody.innerHTML = filtrados.map(p => {
-        const st = strLower(p.status);
-        let badgeClass = "bg-slate-100 text-slate-700";
-        if (st === "concluído" || st === "concluido") badgeClass = "bg-emerald-100 text-emerald-800";
-        else if (st === "agendado") badgeClass = "bg-blue-100 text-blue-800";
-        else if (st.includes("faturamento") || st.includes("separação")) badgeClass = "bg-amber-100 text-amber-800";
-
-        const pedidoCliente = p.cliente ? `#${p.pedido} • ${p.cliente}` : `#${p.pedido}`;
-        const npsVal = p.nps ? `${p.nps} ★` : "-";
-
-        return `
-          <tr class="hover:bg-slate-50 transition whitespace-nowrap">
-            <td class="py-3 px-3.5 font-extrabold text-slate-800">${pedidoCliente}</td>
-            <td class="py-3 px-3.5">
-              <span class="px-2 py-0.5 rounded bg-slate-800 text-white text-[10px] font-extrabold uppercase">${p.filial || "-"}</span>
-            </td>
-            <td class="py-3 px-3.5 font-semibold text-slate-600">${p.agendamento || p.data || "-"}</td>
-            <td class="py-3 px-3.5 font-bold text-[#007A33]">${p.nf || "-"}</td>
-            <td class="py-3 px-3.5 font-medium text-slate-700">${p.itens || "-"}</td>
-            <td class="py-3 px-3.5">
-              <span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold ${badgeClass}">
-                ${p.status || "-"}
-              </span>
-            </td>
-            <td class="py-3 px-3.5 font-mono text-slate-600">${limparHoraExibicao(p.t_inicio)}</td>
-            <td class="py-3 px-3.5 font-mono text-slate-600">${limparHoraExibicao(p.t_nf)}</td>
-            <td class="py-3 px-3.5 font-mono text-slate-600">${limparHoraExibicao(p.t_sep_ini)}</td>
-            <td class="py-3 px-3.5 font-mono text-slate-600">${limparHoraExibicao(p.t_fim)}</td>
-            <td class="py-3 px-3.5 font-extrabold text-slate-800">${p.tempo_total || "-"}</td>
-            <td class="py-3 px-3.5 text-center font-extrabold text-amber-500">${npsVal}</td>
-          </tr>
-        `;
-      }).join("");
+    function esconderTodasTelas() {
+      document.getElementById("viewMenu").classList.add("hidden");
+      document.getElementById("viewRegistrar").classList.add("hidden");
+      document.getElementById("viewFaturista").classList.add("hidden");
+      document.getElementById("viewOperador").classList.add("hidden");
+      document.getElementById("viewRelatorio").classList.add("hidden");
+      document.getElementById("viewGestao").classList.add("hidden");
     }
 
     // =========================================================================
@@ -736,36 +1096,49 @@
     // =========================================================================
     function abrirPerfil(perfil) {
       localStorage.setItem("ifco_v3_perfil_atual", perfil);
-      document.getElementById("viewMenu").classList.add("hidden");
-      document.getElementById("viewRelatorio").classList.add("hidden");
+      esconderTodasTelas();
       document.getElementById("btnMenuTop").classList.remove("hidden");
 
-      if (perfil === "faturista") {
+      if (perfil === "registrar") {
+        document.getElementById("viewRegistrar").classList.remove("hidden");
+        atualizarHoraChegadaInput();
+      } else if (perfil === "faturista") {
         document.getElementById("viewFaturista").classList.remove("hidden");
-        document.getElementById("viewOperador").classList.add("hidden");
         mudarAbaFaturista("fila");
-      } else {
+        carregarDados();
+      } else if (perfil === "operador") {
         document.getElementById("opFilialHeader").textContent = filialOperadorLogada;
         document.getElementById("viewOperador").classList.remove("hidden");
-        document.getElementById("viewFaturista").classList.add("hidden");
+        carregarDados();
       }
-
-      carregarDados();
     }
 
     function voltarMenu() {
-      if (pedidoAtivoOperador) {
-        const confirmar = confirm("Você tem um carregamento aberto em andamento. Deseja realmente voltar ao menu inicial?");
-        if (!confirmar) return;
-      }
       pararQrAgenda();
       liberarTelaSempreLigada();
       localStorage.removeItem("ifco_v3_perfil_atual");
+      esconderTodasTelas();
       document.getElementById("viewMenu").classList.remove("hidden");
-      document.getElementById("viewFaturista").classList.add("hidden");
-      document.getElementById("viewOperador").classList.add("hidden");
-      document.getElementById("viewRelatorio").classList.add("hidden");
       document.getElementById("btnMenuTop").classList.add("hidden");
+      atualizarBadgesMenu();
+    }
+
+    function atualizarBadgesMenu() {
+      const qtdFat = todosPedidos.filter(p => {
+        const st = strLower(p.status);
+        return st === "aguardando faturamento" || st === "agendado" || st === "em faturamento";
+      }).length;
+      const qtdOp = todosPedidos.filter(p => {
+        const st = strLower(p.status);
+        return st === "aguardando separação" || st === "em separação";
+      }).length;
+
+      const bFat = document.getElementById("badgeMenuFat");
+      const bOp = document.getElementById("badgeMenuOp");
+      bFat.textContent = qtdFat;
+      bOp.textContent = qtdOp;
+      bFat.classList.toggle("hidden", qtdFat === 0);
+      bOp.classList.toggle("hidden", qtdOp === 0);
     }
 
     // =========================================================================
@@ -777,9 +1150,11 @@
         const res = await fetch(SCRIPT_URL);
         const data = await res.json();
         todosPedidos = Array.isArray(data) ? data : [];
+        atualizarBadgesMenu();
         renderizarTabelaAgendados();
         renderizarFilaOperador();
         renderizarRelatorio();
+        renderizarTorreControle();
       } catch (err) {
         console.error(err);
         mostrarToast("Erro ao buscar dados da planilha", true);
@@ -808,96 +1183,13 @@
     }
 
     // =========================================================================
-    // LÓGICA DO FATURISTA (HUB BRASIL: VÊ TODAS AS FILIAIS)
+    // MÓDULO 1: REGISTRAR ATENDIMENTO (FILIAIS -> FILA HUB)
     // =========================================================================
-    function mudarAbaFaturista(aba) {
-      pararQrAgenda();
-
-      document.getElementById("fatSubFila").classList.add("hidden");
-      document.getElementById("fatSubCadastrar").classList.add("hidden");
-      document.getElementById("fatSubAtivo").classList.add("hidden");
-
-      const btnFila = document.getElementById("tabFatFila");
-      const btnCad = document.getElementById("tabFatCadastrar");
-
-      btnFila.className = "px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition flex items-center gap-2";
-      btnCad.className = "px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition flex items-center gap-2";
-
-      if (aba === "fila") {
-        document.getElementById("fatSubFila").classList.remove("hidden");
-        btnFila.className = "px-4 py-2 rounded-lg text-sm font-bold ifco-green text-white transition flex items-center gap-2";
-      } else if (aba === "cadastrar") {
-        document.getElementById("fatSubCadastrar").classList.remove("hidden");
-        btnCad.className = "px-4 py-2 rounded-lg text-sm font-bold ifco-green text-white transition flex items-center gap-2";
-      } else if (aba === "ativo") {
-        document.getElementById("fatSubAtivo").classList.remove("hidden");
-        document.getElementById("tabFatAtivo").classList.remove("hidden");
-      }
-    }
-
-    function renderizarTabelaAgendados() {
-      const tbody = document.getElementById("tbodyAgendados");
-      const termo = strLower(document.getElementById("buscaAgendados").value);
-
-      const agendados = todosPedidos.filter(p => {
-        const st = strLower(p.status);
-        const matchStatus = st === "agendado" || st === "em faturamento";
-        const matchBusca = !termo ||
-          strLower(p.pedido).includes(termo) ||
-          strLower(p.filial).includes(termo) ||
-          strLower(p.cliente).includes(termo) ||
-          strLower(p.itens).includes(termo);
-        return matchStatus && matchBusca;
-      });
-
-      document.getElementById("badgeCountAgendados").textContent = agendados.length;
-
-      if (agendados.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="6" class="py-10 text-center text-slate-400 text-sm">
-              <i class="fa-regular fa-calendar-xmark text-2xl mb-2 block"></i>
-              Nenhum pedido agendado aguardando no momento.<br/>
-              <button onclick="mudarAbaFaturista('cadastrar')" class="mt-2 text-xs font-bold ifco-text underline">+ Cadastrar novo agendamento</button>
-            </td>
-          </tr>`;
-        return;
-      }
-
-      tbody.innerHTML = agendados.map(p => {
-        const emAtendimento = strLower(p.status) === "em faturamento";
-        return `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="py-3.5 px-4 font-extrabold text-slate-800">#${p.pedido}</td>
-            <td class="py-3.5 px-4">
-              <span class="inline-block bg-slate-800 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-md uppercase">
-                ${p.filial || "GERAL"}
-              </span>
-            </td>
-            <td class="py-3.5 px-4 text-xs font-semibold text-slate-600">${p.agendamento || p.data || "Hoje"}</td>
-            <td class="py-3.5 px-4 font-bold text-slate-800">${p.cliente || "Cliente não informado"}</td>
-            <td class="py-3.5 px-4">
-              <span class="inline-block bg-emerald-50 text-[#007A33] border border-emerald-200 text-xs font-extrabold px-2.5 py-1 rounded-lg">
-                ${p.itens || "-"}
-              </span>
-            </td>
-            <td class="py-3.5 px-4 text-right">
-              <button onclick='iniciarAtendimento(${JSON.stringify(p).replace(/'/g, "&apos;")})'
-                class="${emAtendimento ? 'bg-amber-500 hover:bg-amber-600' : 'ifco-green hover:ifco-green-dark'} text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-sm transition inline-flex items-center gap-1.5">
-                <i class="fa-solid ${emAtendimento ? 'fa-arrow-right' : 'fa-play'}"></i>
-                ${emAtendimento ? 'Continuar NF' : 'Iniciar Atendimento'}
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join("");
-    }
-
     function adicionarItemCadastro() {
       const modelo = document.getElementById("cadModeloInput").value.trim().toUpperCase();
       const qtd = document.getElementById("cadQtdInput").value;
       if (!modelo || !qtd || Number(qtd) <= 0) {
-        return mostrarToast("Digite o modelo e informe a quantidade", true);
+        return mostrarToast("Digite o modelo de caixa e a quantidade", true);
       }
       itensCadastroTemp.push({ modelo, qtd: Number(qtd) });
       document.getElementById("cadModeloInput").value = "";
@@ -914,63 +1206,97 @@
     function renderizarItensCadastro() {
       const container = document.getElementById("listaItensCadastro");
       if (itensCadastroTemp.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-400 italic">Nenhum item adicionado ainda.</p>`;
+        container.innerHTML = `<p class="text-xs text-slate-500 italic">Digite o modelo e a quantidade acima (ou clique em + Adicionar para múltiplos modelos).</p>`;
         return;
       }
       container.innerHTML = itensCadastroTemp.map((item, idx) => `
-        <div class="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-slate-200 text-xs font-bold">
+        <div class="flex items-center justify-between bg-white px-3 py-2 rounded-lg border border-amber-300 text-xs font-bold">
           <span>Modelo <span class="ifco-text">${item.modelo}</span> — ${item.qtd} caixas</span>
           <button onclick="removerItemCadastro(${idx})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
         </div>
       `).join("");
     }
 
-    async function salvarAgendamento() {
-      const pedido = document.getElementById("cadPedidoId").value.trim();
-      const filial = document.getElementById("cadFilial").value.trim().toUpperCase();
-      const dataIso = document.getElementById("cadData").value;
-      const agendamento = formatarDataBr(dataIso);
-      const cliente = document.getElementById("cadCliente").value.trim();
+    async function salvarRegistroAtendimento() {
+      const filial = document.getElementById("regFilial").value.trim().toUpperCase();
+      const pedido = document.getElementById("regPedido").value.trim();
+      const codigoCliente = document.getElementById("regCodigoCliente").value.trim();
+      const cnpj = document.getElementById("regCnpj").value.trim();
+      const cliente = document.getElementById("regRazaoSocial").value.trim().toUpperCase();
+      const motorista = document.getElementById("regMotorista").value.trim().toUpperCase();
+      const placa = document.getElementById("regPlaca").value.trim().toUpperCase();
+      const tInicio = document.getElementById("regHoraChegada").value.trim() || horaAtualFormatada();
 
-      if (!pedido || !filial || !cliente || !agendamento) {
-        return mostrarToast("Preencha Pedido, Filial, Cliente e Data!", true);
+      const modeloPendente = document.getElementById("cadModeloInput").value.trim().toUpperCase();
+      const qtdPendente = document.getElementById("cadQtdInput").value;
+      if (modeloPendente && qtdPendente && Number(qtdPendente) > 0) {
+        itensCadastroTemp.push({ modelo: modeloPendente, qtd: Number(qtdPendente) });
+        document.getElementById("cadModeloInput").value = "";
+        document.getElementById("cadQtdInput").value = "";
+        renderizarItensCadastro();
+      }
+
+      if (!filial || !pedido || !codigoCliente || !cliente) {
+        return mostrarToast("Preencha Filial, Nº do Pedido, Código IFCO do Cliente e Razão Social!", true);
       }
       if (itensCadastroTemp.length === 0) {
-        return mostrarToast("Adicione pelo menos um modelo e quantidade", true);
+        return mostrarToast("Informe o Modelo de Caixa e a Quantidade!", true);
       }
 
       const itensFormatado = itensCadastroTemp.map(i => `${i.modelo} (${i.qtd})`).join(" | ");
+      const hoje = dataHojeBr();
 
-      const ok = await enviarPost({
-        action: "agendar",
+      const payload = {
+        action: "registrar_atendimento",
         pedido,
+        codigo_cliente: codigoCliente,
         filial,
-        agendamento,
+        cnpj,
         cliente,
-        itens: itensFormatado
-      });
+        motorista,
+        placa,
+        t_inicio: tInicio,
+        data: hoje,
+        itens: itensFormatado,
+        tipo_ordem: document.getElementById("regTipoOrdem").value.trim().toUpperCase(),
+        org_vendas: document.getElementById("regOrgVendas").value.trim(),
+        canal_dist: document.getElementById("regCanalDist").value.trim(),
+        setor_atividade: document.getElementById("regSetorAtiv").value.trim(),
+        escritorio_vendas: document.getElementById("regEscritorioVendas").value.trim(),
+        equipe_vendas: document.getElementById("regEquipeVendas").value.trim(),
+        beneficio_fiscal: document.getElementById("regBeneficioFiscal").value.trim().toUpperCase(),
+        nota_palete: document.getElementById("regNotaPalete").value
+      };
 
+      const ok = await enviarPost(payload);
       if (ok) {
+        localStorage.setItem("ifco_v3_filial_portaria", filial);
         todosPedidos.unshift({
-          pedido,
-          status: "Agendado",
-          filial,
-          agendamento,
-          data: agendamento,
-          cliente,
-          itens: itensFormatado
+          ...payload,
+          status: "Aguardando Faturamento",
+          agendamento: hoje
         });
+        atualizarBadgesMenu();
 
-        document.getElementById("cadPedidoId").value = "";
-        document.getElementById("cadFilial").value = "";
-        document.getElementById("cadCliente").value = "";
-        definirDataHojeInput();
+        document.getElementById("regPedido").value = "";
+        document.getElementById("regCodigoCliente").value = "";
+        document.getElementById("regCnpj").value = "";
+        document.getElementById("regRazaoSocial").value = "";
+        document.getElementById("regMotorista").value = "";
+        document.getElementById("regPlaca").value = "";
+        document.getElementById("regTipoOrdem").value = "";
+        document.getElementById("regOrgVendas").value = "";
+        document.getElementById("regCanalDist").value = "";
+        document.getElementById("regSetorAtiv").value = "";
+        document.getElementById("regEscritorioVendas").value = "";
+        document.getElementById("regEquipeVendas").value = "";
+        document.getElementById("regBeneficioFiscal").value = "";
+        document.getElementById("regNotaPalete").value = "NÃO";
         itensCadastroTemp = [];
         renderizarItensCadastro();
+        atualizarHoraChegadaInput();
 
-        mostrarToast(`Agendamento registrado para ${filial}!`);
-        mudarAbaFaturista("fila");
-        renderizarTabelaAgendados();
+        mostrarToast(`Pedido #${pedido} (Cliente ${codigoCliente} - ${filial}) enviado para o Faturamento!`);
         setTimeout(carregarDados, 1500);
       }
     }
@@ -1001,7 +1327,7 @@
     function pararQrAgenda() {
       const container = document.getElementById("qrReaderAgendaContainer");
       container.classList.add("hidden");
-      document.getElementById("txtBtnQrAgenda").textContent = "Abrir Leitor de QR Code";
+      document.getElementById("txtBtnQrAgenda").textContent = "Ler QR Code";
       if (qrScannerAgenda) {
         qrScannerAgenda.stop().catch(() => {});
         qrScannerAgenda = null;
@@ -1011,53 +1337,203 @@
     function processarQrCodeLido(texto) {
       try {
         const obj = JSON.parse(texto);
-        if (obj.pedido) document.getElementById("cadPedidoId").value = obj.pedido;
-        if (obj.filial) document.getElementById("cadFilial").value = String(obj.filial).toUpperCase();
-        if (obj.cliente) document.getElementById("cadCliente").value = obj.cliente;
+        if (obj.pedido) document.getElementById("regPedido").value = obj.pedido;
+        if (obj.codigo_cliente || obj.codigo) document.getElementById("regCodigoCliente").value = obj.codigo_cliente || obj.codigo;
+        if (obj.filial) document.getElementById("regFilial").value = String(obj.filial).toUpperCase();
+        if (obj.cliente || obj.razao_social) document.getElementById("regRazaoSocial").value = obj.cliente || obj.razao_social;
+        if (obj.cnpj) document.getElementById("regCnpj").value = obj.cnpj;
+        if (obj.motorista) document.getElementById("regMotorista").value = obj.motorista;
+        if (obj.placa) document.getElementById("regPlaca").value = obj.placa;
         if (obj.itens && Array.isArray(obj.itens)) {
           itensCadastroTemp = obj.itens;
           renderizarItensCadastro();
         }
-        mostrarToast("QR Code lido! Confira e clique em Registrar.");
+        mostrarToast("QR Code lido! Confira os dados e clique em Registrar.");
       } catch (e) {
         const matchNum = texto.match(/\d{4,10}/);
-        document.getElementById("cadPedidoId").value = matchNum ? matchNum[0] : texto;
-        mostrarToast("Código lido! Complete filial/cliente e registre.");
+        document.getElementById("regPedido").value = matchNum ? matchNum[0] : texto;
+        mostrarToast("Código lido! Complete os demais campos.");
       }
     }
 
-    async function iniciarAtendimento(pedidoObj) {
-      const agoraStr = horaAtualFormatada();
-      pedidoAtivoFaturista = { ...pedidoObj, t_inicio: limparHoraExibicao(pedidoObj.t_inicio) !== "-" ? limparHoraExibicao(pedidoObj.t_inicio) : agoraStr };
+    // =========================================================================
+    // MÓDULO 2: FATURAMENTO (HUB BRASIL: FILA FIFO + SLA -> FICHA + NF)
+    // =========================================================================
+    function mudarAbaFaturista(aba) {
+      document.getElementById("fatSubFila").classList.add("hidden");
+      document.getElementById("fatSubAtivo").classList.add("hidden");
+
+      const btnFila = document.getElementById("tabFatFila");
+      btnFila.className = "px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100 transition flex items-center gap-2";
+
+      if (aba === "fila") {
+        document.getElementById("fatSubFila").classList.remove("hidden");
+        btnFila.className = "px-4 py-2 rounded-lg text-sm font-bold ifco-green text-white transition flex items-center gap-2";
+      } else if (aba === "ativo") {
+        document.getElementById("fatSubAtivo").classList.remove("hidden");
+        document.getElementById("tabFatAtivo").classList.remove("hidden");
+      }
+    }
+
+    function renderizarTabelaAgendados() {
+      const tbody = document.getElementById("tbodyAgendados");
+      const termo = strLower(document.getElementById("buscaAgendados").value);
+
+      const filaHub = todosPedidos
+        .filter(p => {
+          const st = strLower(p.status);
+          const matchStatus = st === "aguardando faturamento" || st === "agendado" || st === "em faturamento";
+          const matchBusca = !termo ||
+            strLower(p.pedido).includes(termo) ||
+            strLower(p.codigo_cliente).includes(termo) ||
+            strLower(p.filial).includes(termo) ||
+            strLower(p.cliente).includes(termo) ||
+            strLower(p.itens).includes(termo);
+          return matchStatus && matchBusca;
+        })
+        .sort((a, b) => segundosDesdeHora(b.t_inicio) - segundosDesdeHora(a.t_inicio));
+
+      document.getElementById("badgeCountAgendados").textContent = filaHub.length;
+
+      if (filaHub.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-10 text-center text-slate-400 text-sm">
+              <i class="fa-regular fa-circle-check text-2xl mb-2 block text-emerald-600"></i>
+              Nenhum atendimento aguardando faturamento no momento.
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filaHub.map((p, idx) => {
+        const emFaturamento = strLower(p.status) === "em faturamento";
+        const horaChegada = limparHoraExibicao(p.t_inicio);
+        const diffSeg = segundosDesdeHora(p.t_inicio);
+        const estiloSla = obterEstiloSlaFila(diffSeg);
+
+        return `
+          <tr class="${estiloSla.row} transition">
+            <td class="py-3.5 px-4">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-black flex items-center justify-center" title="Ordem de chegada na fila">
+                  ${idx + 1}º
+                </span>
+                <span class="inline-block bg-slate-800 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-md uppercase">
+                  ${p.filial || "GERAL"}
+                </span>
+              </div>
+            </td>
+            <td class="py-3.5 px-4">
+              <p class="font-extrabold text-slate-800">${p.cliente || "Cliente não informado"}</p>
+              <p class="text-[11px] text-slate-500 font-semibold">Pedido: <strong>#${p.pedido}</strong> • Cód. Cliente: <strong>${p.codigo_cliente || "-"}</strong></p>
+            </td>
+            <td class="py-3.5 px-4">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="font-mono text-xs font-bold text-slate-600">${horaChegada}</span>
+                <span data-cronometro-inicio="${horaChegada}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono text-xs font-extrabold ${estiloSla.badge}">
+                  <i class="${estiloSla.icone}"></i> <span>${formatarCronometroFila(diffSeg)}</span>
+                </span>
+              </div>
+            </td>
+            <td class="py-3.5 px-4">
+              <span class="inline-block bg-emerald-50 text-[#007A33] border border-emerald-200 text-xs font-extrabold px-2.5 py-1 rounded-lg">
+                ${p.itens || "-"}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-right">
+              <button onclick='iniciarAtendimento(${JSON.stringify(p).replace(/'/g, "&apos;")})'
+                class="${emFaturamento ? 'bg-amber-500 hover:bg-amber-600' : 'ifco-green hover:ifco-green-dark'} text-white text-xs font-extrabold px-4 py-2.5 rounded-xl shadow-sm transition inline-flex items-center gap-1.5">
+                <i class="fa-solid ${emFaturamento ? 'fa-arrow-right' : 'fa-play'}"></i>
+                ${emFaturamento ? 'Continuar Faturamento' : 'Iniciar Faturamento'}
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      if (!intervaloCronometroFila) {
+        intervaloCronometroFila = setInterval(atualizarCronometrosAoVivo, 1000);
+      }
+    }
+
+    async function iniciarAtendimento(pedidoObj, restoring = false) {
+      const horaChegadaLimpa = limparHoraExibicao(pedidoObj.t_inicio) !== "-" ? limparHoraExibicao(pedidoObj.t_inicio) : horaAtualFormatada();
+      pedidoAtivoFaturista = { ...pedidoObj, t_inicio: horaChegadaLimpa };
+      localStorage.setItem("ifco_v3_fat_ativo", JSON.stringify(pedidoAtivoFaturista));
 
       document.getElementById("ativoPedidoId").textContent = pedidoAtivoFaturista.pedido;
       document.getElementById("ativoFilialBadge").textContent = pedidoAtivoFaturista.filial || "GERAL";
       document.getElementById("ativoClienteNome").textContent = pedidoAtivoFaturista.cliente || "Cliente";
-      document.getElementById("ativoHoraInicio").textContent = pedidoAtivoFaturista.t_inicio;
-      document.getElementById("ativoItensResumo").textContent = pedidoAtivoFaturista.itens || "-";
-      document.getElementById("ativoInputNf").value = "";
+      document.getElementById("ativoCodigoClienteBadge").textContent = pedidoAtivoFaturista.codigo_cliente || "-";
+      document.getElementById("ativoHoraInicio").textContent = horaChegadaLimpa;
+      document.getElementById("ativoInputNf").value = pedidoAtivoFaturista.nf || "";
+
+      const linhasFicha = [
+        { label: "FILIAL", valor: pedidoAtivoFaturista.filial || "-", destaque: true },
+        { label: "Nº DO PEDIDO", valor: pedidoAtivoFaturista.pedido, destaque: true },
+        { label: "CÓDIGO IFCO DO CLIENTE", valor: pedidoAtivoFaturista.codigo_cliente || "-", destaque: true },
+        { label: "CNPJ", valor: pedidoAtivoFaturista.cnpj || "-" },
+        { label: "RAZÃO SOCIAL", valor: pedidoAtivoFaturista.cliente || "-" },
+        { label: "MODELO & QUANTIDADE", valor: pedidoAtivoFaturista.itens || "-", destaque: true },
+        { label: "NOME DO MOTORISTA", valor: pedidoAtivoFaturista.motorista || "-", destaque: true },
+        { label: "PLACA DO VEÍCULO", valor: pedidoAtivoFaturista.placa || "-", destaque: true },
+        { label: "HORÁRIO DE CHEGADA", valor: horaChegadaLimpa, destaque: true },
+        { label: "TIPO DE ORDEM", valor: pedidoAtivoFaturista.tipo_ordem || "-" },
+        { label: "ORGANIZAÇÃO VENDAS", valor: pedidoAtivoFaturista.org_vendas || "-" },
+        { label: "CANAL DE DISTRIBUIÇÃO", valor: pedidoAtivoFaturista.canal_dist || "-" },
+        { label: "SETOR DE ATIVIDADE", valor: pedidoAtivoFaturista.setor_atividade || "-" },
+        { label: "ESCRITÓRIO DE VENDAS", valor: pedidoAtivoFaturista.escritorio_vendas || "-" },
+        { label: "EQUIPE DE VENDAS", valor: pedidoAtivoFaturista.equipe_vendas || "-" },
+        { label: "CÓDIGO BENEFÍCIO FISCAL", valor: pedidoAtivoFaturista.beneficio_fiscal || "-" },
+        { label: "NECESSIDADE DE NOTA DE PALETE", valor: pedidoAtivoFaturista.nota_palete || "NÃO" }
+      ];
+
+      document.getElementById("ativoFichaCompleta").innerHTML = linhasFicha.map(item => `
+        <div class="grid grid-cols-12 items-center">
+          <div class="col-span-5 sm:col-span-4 px-3.5 py-2.5 font-extrabold uppercase ${item.destaque ? 'bg-amber-100/80 text-slate-900' : 'bg-slate-50 text-slate-700'}">
+            ${item.label}
+          </div>
+          <div class="col-span-7 sm:col-span-8 px-3.5 py-2.5 font-bold text-slate-900 flex items-center justify-between bg-white">
+            <span>${item.valor}</span>
+            ${item.valor && item.valor !== "-" ? `
+              <button type="button" onclick="copiarCampo('${String(item.valor).replace(/'/g, "\\'")}')" title="Copiar" class="text-slate-400 hover:text-[#007A33] text-xs px-1.5">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            ` : ""}
+          </div>
+        </div>
+      `).join("");
 
       mudarAbaFaturista("ativo");
       setTimeout(() => document.getElementById("ativoInputNf").focus(), 150);
 
-      if (strLower(pedidoObj.status) === "agendado") {
+      const stAtual = strLower(pedidoObj.status);
+      if (!restoring && (stAtual === "aguardando faturamento" || stAtual === "agendado")) {
         pedidoObj.status = "Em Faturamento";
-        pedidoObj.t_inicio = agoraStr;
+        pedidoObj.t_inicio = horaChegadaLimpa;
         renderizarTabelaAgendados();
 
         await enviarPost({
           action: "iniciar_atendimento",
           pedido: pedidoObj.pedido,
-          t_inicio: agoraStr
+          t_inicio: horaChegadaLimpa
         });
       }
+    }
+
+    function cancelarFaturamentoAtivo() {
+      localStorage.removeItem("ifco_v3_fat_ativo");
+      pedidoAtivoFaturista = null;
+      document.getElementById("tabFatAtivo").classList.add("hidden");
+      mudarAbaFaturista("fila");
     }
 
     async function enviarParaExpedicao() {
       if (!pedidoAtivoFaturista) return;
       const nf = document.getElementById("ativoInputNf").value.trim();
       if (!nf) {
-        return mostrarToast("Bipe ou digite o número da NF antes de enviar!", true);
+        return mostrarToast("Informe o Nº da Nota Fiscal antes de enviar para expedição!", true);
       }
 
       const tNf = horaAtualFormatada();
@@ -1077,17 +1553,19 @@
             : p
         );
         const filialDestino = pedidoAtivoFaturista.filial || "Doca";
+        localStorage.removeItem("ifco_v3_fat_ativo");
         pedidoAtivoFaturista = null;
         document.getElementById("tabFatAtivo").classList.add("hidden");
-        mostrarToast(`NF registrada! Enviado para a doca de ${filialDestino}.`);
+        mostrarToast(`NF ${nf} registrada! Enviado para a expedição de ${filialDestino}.`);
         mudarAbaFaturista("fila");
         renderizarTabelaAgendados();
+        atualizarBadgesMenu();
         setTimeout(carregarDados, 1500);
       }
     }
 
     // =========================================================================
-    // LÓGICA DO OPERADOR LOGÍSTICO (FILTRADO EXCLUSIVAMENTE PELA FILIAL)
+    // MÓDULO 3: OPERADOR LOGÍSTICO (FILTRADO POR FILIAL)
     // =========================================================================
     function renderizarFilaOperador() {
       const container = document.getElementById("opListaPedidos");
@@ -1116,7 +1594,7 @@
               <span class="font-extrabold text-base text-slate-800">Pedido #${p.pedido}</span>
               <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800">NF ${p.nf || "-"}</span>
             </div>
-            <p class="text-xs font-semibold text-slate-600 mt-0.5">${p.cliente || "Cliente"}</p>
+            <p class="text-xs font-semibold text-slate-600 mt-0.5">${p.cliente || "Cliente"} ${p.placa ? `• Placa: ${p.placa}` : ""}</p>
             <p class="text-xs font-extrabold ifco-text mt-1">${p.itens || "-"}</p>
           </div>
           <button onclick='abrirRomaneioOperador(${JSON.stringify(p).replace(/'/g, "&apos;")})'
@@ -1194,8 +1672,7 @@
         5: "5 Estrelas — Excelente!"
       };
 
-      const botoes = document.querySelectorAll(".star-btn");
-      botoes.forEach((btn, index) => {
+      document.querySelectorAll(".star-btn").forEach((btn, index) => {
         if (index < nota) {
           btn.classList.remove("text-slate-300");
           btn.classList.add("text-amber-400");
@@ -1235,6 +1712,319 @@
         mostrarToast("Carregamento finalizado com sucesso!");
         fecharRomaneioOperador();
         setTimeout(carregarDados, 1200);
+      }
+    }
+
+    // =========================================================================
+    // MÓDULO 4: RELATÓRIO DE ATENDIMENTOS (ÁREA RESTRITA)
+    // =========================================================================
+    function renderizarRelatorio() {
+      const tbody = document.getElementById("tbodyRelatorio");
+      const termo = strLower(document.getElementById("buscaRelatorio").value);
+
+      const filtrados = todosPedidos.filter(p => {
+        if (!termo) return true;
+        return (
+          strLower(p.pedido).includes(termo) ||
+          strLower(p.codigo_cliente).includes(termo) ||
+          strLower(p.filial).includes(termo) ||
+          strLower(p.cliente).includes(termo) ||
+          strLower(p.nf).includes(termo) ||
+          strLower(p.itens).includes(termo) ||
+          strLower(p.status).includes(termo) ||
+          strLower(p.data).includes(termo)
+        );
+      });
+
+      document.getElementById("relatorioCount").textContent = filtrados.length;
+
+      if (filtrados.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="12" class="py-10 text-center text-slate-400 text-sm">
+              Nenhum registro encontrado na planilha.
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtrados.map(p => {
+        const st = strLower(p.status);
+        let badgeClass = "bg-slate-100 text-slate-700";
+        if (st === "concluído" || st === "concluido") badgeClass = "bg-emerald-100 text-emerald-800";
+        else if (st.includes("aguardando faturamento") || st === "agendado") badgeClass = "bg-blue-100 text-blue-800";
+        else if (st.includes("faturamento") || st.includes("separação")) badgeClass = "bg-amber-100 text-amber-800";
+
+        const codCliTxt = p.codigo_cliente ? ` [Cli: ${p.codigo_cliente}]` : "";
+        const pedidoCliente = p.cliente ? `#${p.pedido}${codCliTxt} • ${p.cliente}` : `#${p.pedido}`;
+        const npsVal = p.nps ? `${p.nps} ★` : "-";
+
+        return `
+          <tr class="hover:bg-slate-50 transition whitespace-nowrap">
+            <td class="py-3 px-3.5 font-extrabold text-slate-800">${pedidoCliente}</td>
+            <td class="py-3 px-3.5">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-white text-[10px] font-extrabold uppercase">${p.filial || "-"}</span>
+            </td>
+            <td class="py-3 px-3.5 font-semibold text-slate-600">${p.data || p.agendamento || "-"}</td>
+            <td class="py-3 px-3.5 font-bold text-[#007A33]">${p.nf || "-"}</td>
+            <td class="py-3 px-3.5 font-medium text-slate-700">${p.itens || "-"}</td>
+            <td class="py-3 px-3.5">
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold ${badgeClass}">
+                ${p.status || "-"}
+              </span>
+            </td>
+            <td class="py-3 px-3.5 font-mono text-slate-600">${limparHoraExibicao(p.t_inicio)}</td>
+            <td class="py-3 px-3.5 font-mono text-slate-600">${limparHoraExibicao(p.t_nf)}</td>
+            <td class="py-3 px-3.5 font-mono text-slate-600">${limparHoraExibicao(p.t_sep_ini)}</td>
+            <td class="py-3 px-3.5 font-mono text-slate-600">${limparHoraExibicao(p.t_fim)}</td>
+            <td class="py-3 px-3.5 font-extrabold text-slate-800">${p.tempo_total || "-"}</td>
+            <td class="py-3 px-3.5 text-center font-extrabold text-amber-500">${npsVal}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    // =========================================================================
+    // MÓDULO 5: TORRE DE CONTROLE (GERÊNCIA - GERAL E POR FILIAL)
+    // =========================================================================
+    function diferencaMinutosHoras(inicioStr, fimStr) {
+      const h1 = limparHoraExibicao(inicioStr);
+      const h2 = limparHoraExibicao(fimStr);
+      if (!h1 || !h2 || h1 === "-" || h2 === "-") return null;
+      const p1 = h1.split(":").map(Number);
+      const p2 = h2.split(":").map(Number);
+      if (p1.length < 2 || p2.length < 2 || p1.some(isNaN) || p2.some(isNaN)) return null;
+      const seg1 = p1[0] * 3600 + p1[1] * 60 + (p1[2] || 0);
+      const seg2 = p2[0] * 3600 + p2[1] * 60 + (p2[2] || 0);
+      let diff = seg2 - seg1;
+      if (diff < 0) diff += 86400;
+      return diff / 60;
+    }
+
+    function extrairTotalCaixasPedido(itensStr) {
+      if (!itensStr) return 0;
+      const matches = String(itensStr).match(/\((\d+)\)/g);
+      if (!matches) return 0;
+      return matches.reduce((acc, m) => acc + Number(m.replace(/\D/g, "")), 0);
+    }
+
+    function selecionarFilialTorre(filial) {
+      const sel = document.getElementById("filtroGestaoFilial");
+      sel.value = filial;
+      renderizarTorreControle();
+    }
+
+    function renderizarTorreControle() {
+      const sel = document.getElementById("filtroGestaoFilial");
+      if (!sel) return;
+      const valorAtual = sel.value || "TODAS";
+
+      const filiaisUnicas = [...new Set(todosPedidos.map(p => (p.filial || "").trim().toUpperCase()).filter(Boolean))].sort();
+      sel.innerHTML = `<option value="TODAS">BRASIL (VISÃO GERAL)</option>` +
+        filiaisUnicas.map(f => `<option value="${f}">${f}</option>`).join("");
+      sel.value = filiaisUnicas.includes(valorAtual) ? valorAtual : "TODAS";
+
+      const filtro = sel.value;
+      const base = filtro === "TODAS"
+        ? todosPedidos
+        : todosPedidos.filter(p => (p.filial || "").trim().toUpperCase() === filtro);
+
+      // 1. Contadores em Tempo Real
+      const filaFat = base.filter(p => strLower(p.status) === "aguardando faturamento" || strLower(p.status) === "agendado");
+      const emFat = base.filter(p => strLower(p.status) === "em faturamento");
+      const aguardDoca = base.filter(p => strLower(p.status) === "aguardando separação");
+      const emSep = base.filter(p => strLower(p.status) === "em separação");
+      const concluidos = base.filter(p => strLower(p.status) === "concluído" || strLower(p.status) === "concluido");
+
+      const criticosFilaFat = filaFat.filter(p => (segundosDesdeHora(p.t_inicio) / 60) > 20).length;
+
+      document.getElementById("kpiFilaFat").textContent = filaFat.length;
+      const elCrit = document.getElementById("kpiFilaFatCritico");
+      elCrit.textContent = `${criticosFilaFat} acima de 20 min`;
+      elCrit.className = criticosFilaFat > 0
+        ? "text-[11px] font-extrabold text-red-600 mt-1"
+        : "text-[11px] font-bold text-emerald-700 mt-1";
+
+      document.getElementById("kpiEmFat").textContent = emFat.length;
+      document.getElementById("kpiAguardDoca").textContent = aguardDoca.length;
+      document.getElementById("kpiEmSep").textContent = emSep.length;
+      document.getElementById("kpiConcluidos").textContent = concluidos.length;
+      document.getElementById("kpiTotalCaminhoes").textContent = `de ${base.length} atendimentos`;
+
+      // 2. Tempos de Espera: Planejado x Realizado
+      const temposFat = [];
+      const temposEsperaDoca = [];
+      const temposCarreg = [];
+      const temposCicloTotal = [];
+
+      base.forEach(p => {
+        const st = strLower(p.status);
+        const mFat = diferencaMinutosHoras(p.t_inicio, p.t_nf);
+        if (mFat !== null) temposFat.push(mFat);
+        else if (st === "aguardando faturamento" || st === "agendado" || st === "em faturamento") {
+          temposFat.push(segundosDesdeHora(p.t_inicio) / 60);
+        }
+
+        const mDoca = diferencaMinutosHoras(p.t_nf, p.t_sep_ini);
+        if (mDoca !== null) temposEsperaDoca.push(mDoca);
+        else if (st === "aguardando separação") {
+          temposEsperaDoca.push(segundosDesdeHora(p.t_nf) / 60);
+        }
+
+        const mCarreg = diferencaMinutosHoras(p.t_sep_ini, p.t_fim);
+        if (mCarreg !== null) temposCarreg.push(mCarreg);
+        else if (st === "em separação") {
+          temposCarreg.push(segundosDesdeHora(p.t_sep_ini) / 60);
+        }
+
+        const mCiclo = diferencaMinutosHoras(p.t_inicio, p.t_fim);
+        if (mCiclo !== null) temposCicloTotal.push(mCiclo);
+      });
+
+      const media = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length) : 0;
+
+      const etapasSla = [
+        { nome: "Espera + Emissão NF (Faturamento)", meta: 8, real: media(temposFat) },
+        { nome: "Fila de Doca (Pós-NF até Início Separação)", meta: 10, real: media(temposEsperaDoca) },
+        { nome: "Separação & Carregamento Físico", meta: 15, real: media(temposCarreg) },
+        { nome: "Ciclo Total de Permanência no Pátio", meta: 33, real: media(temposCicloTotal) }
+      ];
+
+      document.getElementById("containerPlanejadoRealizado").innerHTML = etapasSla.map(et => {
+        const realArr = Number(et.real.toFixed(1));
+        const estourou = realArr > et.meta;
+        const pct = Math.min(100, Math.round((realArr / (et.meta * 1.4)) * 100));
+        const pctMeta = Math.min(100, Math.round((et.meta / (et.meta * 1.4)) * 100));
+
+        return `
+          <div class="space-y-1.5">
+            <div class="flex flex-wrap items-center justify-between gap-1 text-xs">
+              <span class="font-bold text-slate-700">${et.nome}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-slate-500">Planejado: <strong class="text-slate-800">${et.meta} min</strong></span>
+                <span class="px-2 py-0.5 rounded font-extrabold ${estourou ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-800'}">
+                  Realizado: ${realArr} min
+                </span>
+              </div>
+            </div>
+            <div class="relative w-full h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+              <div class="h-full rounded-full transition-all duration-500 ${estourou ? 'bg-red-500' : 'bg-[#007A33]'}" style="width: ${pct}%"></div>
+              <div title="Meta Planejada (${et.meta} min)" class="absolute top-0 bottom-0 w-0.5 bg-slate-900" style="left: ${pctMeta}%"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      // 3. Produtividade & Eficiência
+      const totalCaixas = base.reduce((acc, p) => acc + extrairTotalCaixasPedido(p.itens), 0);
+      const mediaCaixas = base.length ? Math.round(totalCaixas / base.length) : 0;
+
+      const avaliados = base.filter(p => Number(p.nps) > 0);
+      const npsMedio = avaliados.length
+        ? (avaliados.reduce((acc, p) => acc + Number(p.nps), 0) / avaliados.length).toFixed(1)
+        : "-";
+
+      const dentroMeta = base.filter(p => {
+        const mCiclo = diferencaMinutosHoras(p.t_inicio, p.t_fim);
+        if (mCiclo !== null) return mCiclo <= 33;
+        return (segundosDesdeHora(p.t_inicio) / 60) <= 20;
+      }).length;
+      const eficienciaPct = base.length ? Math.round((dentroMeta / base.length) * 100) : 100;
+
+      document.getElementById("kpiTotalCaixas").textContent = `${totalCaixas.toLocaleString("pt-BR")} cx`;
+      document.getElementById("kpiMediaCaixas").textContent = `Média: ${mediaCaixas.toLocaleString("pt-BR")} cx/carga`;
+      document.getElementById("kpiEficienciaSla").textContent = `${eficienciaPct}%`;
+      document.getElementById("kpiEficienciaSla").className = eficienciaPct >= 80
+        ? "text-xl font-black text-[#007A33] mt-1"
+        : "text-xl font-black text-amber-600 mt-1";
+
+      document.getElementById("kpiNpsMedio").textContent = `${npsMedio} ★`;
+      document.getElementById("kpiNpsQtd").textContent = `${avaliados.length} avaliação(ões)`;
+
+      const gargaloEl = document.getElementById("kpiGargaloAtual");
+      const gargaloSub = document.getElementById("kpiGargaloSub");
+      if (criticosFilaFat > 0) {
+        gargaloEl.textContent = "Fila Faturamento";
+        gargaloEl.className = "text-sm font-black text-red-600 mt-1.5";
+        gargaloSub.textContent = `${criticosFilaFat} pedido(s) > 20 min`;
+      } else if (aguardDoca.length > 1) {
+        gargaloEl.textContent = "Espera de Doca";
+        gargaloEl.className = "text-sm font-black text-amber-600 mt-1.5";
+        gargaloSub.textContent = `${aguardDoca.length} caminhões aguardando`;
+      } else {
+        gargaloEl.textContent = "Operação Fluida";
+        gargaloEl.className = "text-sm font-black text-[#007A33] mt-1.5";
+        gargaloSub.textContent = "Dentro dos parâmetros";
+      }
+
+      // 4A. Tabela Desempenho por Filial
+      document.getElementById("tbodyGestaoFiliais").innerHTML = filiaisUnicas.map(f => {
+        const listaF = todosPedidos.filter(p => (p.filial || "").trim().toUpperCase() === f);
+        const ativosF = listaF.filter(p => strLower(p.status) !== "concluído" && strLower(p.status) !== "concluido").length;
+        const conclF = listaF.filter(p => strLower(p.status) === "concluído" || strLower(p.status) === "concluido").length;
+        const caixasF = listaF.reduce((acc, p) => acc + extrairTotalCaixasPedido(p.itens), 0);
+        const ciclosF = listaF
+          .map(p => diferencaMinutosHoras(p.t_inicio, p.t_fim))
+          .filter(v => v !== null);
+        const cicloMedF = ciclosF.length ? `${Math.round(media(ciclosF))} min` : "-";
+        const selecionada = filtro === f;
+
+        return `
+          <tr onclick="selecionarFilialTorre('${f}')" class="cursor-pointer transition ${selecionada ? 'bg-emerald-50 font-bold' : 'hover:bg-slate-50'}">
+            <td class="py-2.5 px-3">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-white text-[10px] font-extrabold uppercase">${f}</span>
+            </td>
+            <td class="py-2.5 px-3 text-center font-extrabold text-amber-600">${ativosF}</td>
+            <td class="py-2.5 px-3 text-center font-extrabold text-emerald-700">${conclF}</td>
+            <td class="py-2.5 px-3 text-right font-bold text-slate-700">${caixasF.toLocaleString("pt-BR")}</td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-800">${cicloMedF}</td>
+          </tr>
+        `;
+      }).join("");
+
+      // 4B. Tabela Acompanhamento de Veículos no Pátio
+      const ativosPatio = base
+        .filter(p => strLower(p.status) !== "concluído" && strLower(p.status) !== "concluido")
+        .sort((a, b) => segundosDesdeHora(b.t_inicio) - segundosDesdeHora(a.t_inicio));
+
+      document.getElementById("badgeVeiculosPatio").textContent = `${ativosPatio.length} veículo(s)`;
+
+      if (ativosPatio.length === 0) {
+        document.getElementById("tbodyGestaoVeiculos").innerHTML = `
+          <tr>
+            <td colspan="4" class="py-6 text-center text-slate-400">Nenhum veículo aguardando no pátio para este filtro.</td>
+          </tr>`;
+      } else {
+        document.getElementById("tbodyGestaoVeiculos").innerHTML = ativosPatio.map(p => {
+          const horaChegada = limparHoraExibicao(p.t_inicio);
+          const diffSeg = segundosDesdeHora(p.t_inicio);
+          const estiloSla = obterEstiloSlaFila(diffSeg);
+          return `
+            <tr class="hover:bg-slate-50">
+              <td class="py-2.5 px-3">
+                <span class="px-2 py-0.5 rounded bg-slate-800 text-white text-[10px] font-extrabold uppercase">${p.filial || "-"}</span>
+              </td>
+              <td class="py-2.5 px-3">
+                <p class="font-extrabold text-slate-800">#${p.pedido} • ${p.cliente}</p>
+                <p class="text-[10px] text-slate-500">${p.placa ? `Placa: ${p.placa} • ` : ""}${p.itens || "-"}</p>
+              </td>
+              <td class="py-2.5 px-3">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-900">
+                  ${p.status}
+                </span>
+              </td>
+              <td class="py-2.5 px-3 text-right">
+                <span data-cronometro-inicio="${horaChegada}" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg border font-mono text-[11px] font-extrabold ${estiloSla.badge}">
+                  <i class="${estiloSla.icone}"></i> <span>${formatarCronometroFila(diffSeg)}</span>
+                </span>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      if (!intervaloCronometroFila) {
+        intervaloCronometroFila = setInterval(atualizarCronometrosAoVivo, 1000);
       }
     }
 
